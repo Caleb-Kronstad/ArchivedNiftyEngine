@@ -33,10 +33,13 @@ bool EngineLayer::LoadScene(Scene* scene)
 			std::size_t pathend = line.find("path_end");
 			std::size_t idpos = line.find("id");
 			std::size_t idend = line.find("id_end");
+			std::size_t namepos = line.find("name");
+			std::size_t nameend = line.find("name_end");
 			std::size_t texturespos = line.find("textures");
 			std::size_t texturesend = line.find("textures_end");
 
 			std::string modelpath = line.substr(pathpos+5, pathend-pathpos-5);
+			std::string name = line.substr(namepos + 5, nameend - namepos - 5);
 			unsigned int modelid = std::stoi(line.substr(idpos+3, idend-idpos-3));
 			unsigned int tex1 = std::stoi(line.substr(texturespos+9, texturesend-texturespos-15));
 			unsigned int tex2 = std::stoi(line.substr(texturespos+11, texturesend-texturespos-13));
@@ -44,6 +47,7 @@ bool EngineLayer::LoadScene(Scene* scene)
 			unsigned int tex4 = std::stoi(line.substr(texturespos+15, texturesend-texturespos-9));
 
 			Model* model = new Model(modelpath, { tex1, tex2, tex3, tex4 }, modelid);
+			model->name = name;
 			m_Models->push_back(model);
 		}
 	}
@@ -152,6 +156,8 @@ bool EngineLayer::LoadScene(Scene* scene)
 
 bool EngineLayer::SaveScene(Scene* scene)
 {
+	Log::Info("Saving...");
+
 	std::vector<Shader*>& shadersRef = *m_Shaders;
 	std::vector<Model*>& modelsRef = *m_Models;
 	std::vector<GameObject*>& objectsRef = *m_GameObjects;
@@ -160,6 +166,8 @@ bool EngineLayer::SaveScene(Scene* scene)
 	std::ifstream rfile(path);
 	std::string line;
 	std::string filecontents;
+	std::string modelcontents;
+	std::string objectcontents;
 
 	filecontents += "Scene: " + scene->GetName() + "\n";
 
@@ -179,13 +187,14 @@ bool EngineLayer::SaveScene(Scene* scene)
 						std::string data =
 							"entity " + modelsRef[i]->type + " entity_end" +
 							" : id " + std::to_string(modelsRef[i]->id) + " id_end" +
+							" : name " + modelsRef[i]->name + " name_end" +
 							" : path " + modelsRef[i]->model_path + " path_end" +
 							" : textures " + std::to_string(modelsRef[i]->textureTypeAmounts[0]) +" "+ std::to_string(modelsRef[i]->textureTypeAmounts[1]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[2]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[3]) + " textures_end";
 						line.replace(line.begin(), line.end(), data);
 
 						modelsRef[i]->saved = true;
 
-						filecontents += line + "\n";
+						modelcontents += line + "\n";
 					}
 				}
 			}
@@ -215,7 +224,7 @@ bool EngineLayer::SaveScene(Scene* scene)
 
 						objectsRef[i]->saved = true;
 
-						filecontents += line + "\n";
+						objectcontents += line + "\n";
 					}
 				}
 			}
@@ -241,15 +250,37 @@ bool EngineLayer::SaveScene(Scene* scene)
 				" : velocity x" + std::to_string(objectsRef[i]->transform.Velocity.x) + " y" + std::to_string(objectsRef[i]->transform.Velocity.y) + " z" + std::to_string(objectsRef[i]->transform.Velocity.z) + " velocity_end" +
 				" : force x" + std::to_string(objectsRef[i]->transform.Force.x) + " y" + std::to_string(objectsRef[i]->transform.Force.y) + " z" + std::to_string(objectsRef[i]->transform.Force.z) + " force_end";
 			
-			filecontents += data + "\n";
+			objectsRef[i]->saved = true;
+
+			objectcontents += data + "\n";
 		}
 	}
+
+	for (int i = 0; i < modelsRef.size(); ++i)
+	{
+		if (modelsRef[i]->saved == false)
+		{
+			std::string data =
+				"entity " + modelsRef[i]->type + " entity_end" +
+				" : id " + std::to_string(modelsRef[i]->id) + " id_end" +
+				" : name " + modelsRef[i]->name + " name_end" +
+				" : path " + modelsRef[i]->model_path + " path_end" +
+				" : textures " + std::to_string(modelsRef[i]->textureTypeAmounts[0]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[1]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[2]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[3]) + " textures_end";
+
+			modelsRef[i]->saved = true;
+
+			modelcontents += data + "\n";
+		}
+	}
+
+	filecontents += modelcontents + objectcontents;
 
 	std::ofstream wfile(path);
 
 	wfile << filecontents;
 
 	wfile.close();
+	Log::Info("Saved");
 
 	return true;
 }

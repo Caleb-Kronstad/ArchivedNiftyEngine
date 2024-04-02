@@ -11,7 +11,6 @@ namespace Nifty {
 	{
 	public:
 		Transform transform;
-		std::string name;
 		Model* model;
 		unsigned int modelid;
 

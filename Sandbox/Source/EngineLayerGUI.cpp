@@ -51,8 +51,10 @@ void EngineLayer::OnImGuiRender()
 		}
 		if (ImGui::BeginMenu("Edit"))
 		{
-			ImGui::MenuItem("Add Object", NULL, &m_AddObjectWindowOpen);
-			ImGui::MenuItem("Add Model", NULL, &m_AddModelWindowOpen);
+			if (ImGui::MenuItem("Add Object", NULL, &m_AddObjectWindowOpen))
+				m_AddModelWindowOpen = false;
+			if (ImGui::MenuItem("Add Model", NULL, &m_AddModelWindowOpen))
+				m_AddObjectWindowOpen = false;
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help"))
@@ -104,14 +106,14 @@ void EngineLayer::OnImGuiRender()
 
 		std::string name = m_PropertiesObject->name + " (" + std::to_string(m_PropertiesObject->id) + ")";
 
-		std::string positionName = "Position (" + std::to_string(m_PropertiesObject->id) + ")";
-		std::string scaleName = "Scale (" + std::to_string(m_PropertiesObject->id) + ")";
-		std::string eulerAngleName = "Euler Angles (" + std::to_string(m_PropertiesObject->id) + ")";
-		std::string angleName = "Angle (" + std::to_string(m_PropertiesObject->id) + ")";
+		std::string positionName = "Position";
+		std::string scaleName = "Scale";
+		std::string eulerAnglesName = "Rotation";
+		std::string angleName = "Angle";
 
-		std::string massName = "Mass (" + std::to_string(m_PropertiesObject->id) + ")";
-		std::string velocityName = "Velocity (" + std::to_string(m_PropertiesObject->id) + ")";
-		std::string forceName = "Force (" + std::to_string(m_PropertiesObject->id) + ")";
+		std::string massName = "Mass";
+		std::string velocityName = "Velocity";
+		std::string forceName = "Force";
 
 		ImGui::Text(name.c_str());
 
@@ -139,14 +141,14 @@ void EngineLayer::OnImGuiRender()
 			{
 				ImGui::InputFloat3(positionName.c_str(), (float*)&m_PropertiesObject->transform.Position);
 				ImGui::InputFloat3(scaleName.c_str(), (float*)&m_PropertiesObject->transform.Scale);
-				ImGui::InputFloat3(eulerAngleName.c_str(), (float*)&m_PropertiesObject->transform.EulerAngles);
+				ImGui::InputFloat3(eulerAnglesName.c_str(), (float*)&m_PropertiesObject->transform.EulerAngles);
 				ImGui::InputFloat(angleName.c_str(), (float*)&m_PropertiesObject->transform.Angle);
 			}
 			if (!m_InputTransformValues)
 			{
 				ImGui::DragFloat3(positionName.c_str(), (float*)&m_PropertiesObject->transform.Position, m_DragStep, -1000, 1000);
 				ImGui::DragFloat3(scaleName.c_str(), (float*)&m_PropertiesObject->transform.Scale, m_DragStep, 0, 1000);
-				ImGui::DragFloat3(eulerAngleName.c_str(), (float*)&m_PropertiesObject->transform.EulerAngles, m_DragStep, 0, 1);
+				ImGui::DragFloat3(eulerAnglesName.c_str(), (float*)&m_PropertiesObject->transform.EulerAngles, m_DragStep, 0, 1);
 				ImGui::SliderFloat(angleName.c_str(), (float*)&m_PropertiesObject->transform.Angle, 0, 360);
 			}
 
@@ -215,8 +217,8 @@ void EngineLayer::OnImGuiRender()
 		{
 			for (unsigned int i = 0; i < modelsRef.size(); ++i)
 			{
-				std::string& modelpath = modelsRef[i]->model_path;
-				if (ImGui::Button(modelpath.c_str(), ImVec2(ImGui::GetWindowWidth() * 0.9f, 15)))
+				std::string& modelname = modelsRef[i]->name;
+				if (ImGui::Button(modelname.c_str(), ImVec2(ImGui::GetWindowWidth() * 0.9f, 15)))
 				{
 					newObjProps.modelid = modelsRef[i]->id;
 				}
@@ -262,6 +264,8 @@ void EngineLayer::OnImGuiRender()
 				m_GameObjects->push_back(gameObject);
 
 				SaveScene(m_Scene);
+
+				m_AddObjectWindowOpen = false;
 			}
 			else
 				Log::Error("Error creating object -- model id: " + std::to_string(newObjProps.modelid) + " -- object id: " + std::to_string(newObjProps.id));
@@ -275,6 +279,41 @@ void EngineLayer::OnImGuiRender()
 	if (m_AddModelWindowOpen)
 	{
 		m_GameWindowInFocus = false;
+
+		ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(window.GetWidth() / 2 - 200, window.GetHeight() / 2 - 200), ImGuiCond_Once);
+		ImGui::Begin("Add Model", &m_AddObjectWindowOpen, popup_flags);
+
+		ImGui::InputText("Name", &newModelProps.name);
+		ImGui::InputText("File path", &newModelProps.path);
+
+		if (ImGui::CollapsingHeader("Textures"))
+		{
+			ImGui::InputInt("Diffuse Texture Amount", (int*)&newModelProps.num_diffuse);
+			ImGui::InputInt("Specular Texture Amount", (int*)&newModelProps.num_specular);
+			ImGui::InputInt("Normal Texture Amount", (int*)&newModelProps.num_normal);
+			ImGui::InputInt("Height Texture Amount", (int*)&newModelProps.num_height);
+		}
+
+		newModelProps.id = modelsRef.size() + 30000001;
+		std::vector<unsigned int> numTextures = { newModelProps.num_diffuse, newModelProps.num_specular, newModelProps.num_normal, newModelProps.num_height };
+
+		ImGui::Spacing();
+		if (ImGui::Button("Create", ImVec2(ImGui::GetWindowWidth() * 0.3f, 20)) && m_ImGuiCanCaptureMouse)
+		{
+			if (newModelProps.id > 30000000 && newModelProps.id < 40000000)
+			{
+				Model* model = new Model(newModelProps.path, numTextures, newModelProps.id);
+				m_Models->push_back(model);
+				SaveScene(m_Scene);
+				
+				m_AddModelWindowOpen = false;
+			}
+			else
+				Log::Error("Error creating model -- model id: " + newModelProps.id);
+		}
+
+		ImGui::End();
 	}
 	// ------------------------------
 

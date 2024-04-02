@@ -35,6 +35,18 @@ struct NewObjectProps
 	glm::vec3 force = glm::vec3(0.0f);
 };
 
+struct NewModelProps
+{
+	std::string name = "New Model";
+	std::string path = "";
+	int id = 0;
+
+	unsigned int num_diffuse = 0;
+	unsigned int num_specular = 0;
+	unsigned int num_normal = 0;
+	unsigned int num_height = 0;
+};
+
 
 class EngineLayer : public Layer
 {
@@ -44,7 +56,6 @@ private:
 	std::vector<Shader*>* m_Shaders;
 	std::vector<Model*>* m_Models;
 	std::vector<GameObject*>* m_GameObjects;
-	NewObjectProps newObjProps;
 	GameObject* m_PropertiesObject = nullptr;
 
 	Skybox* m_Skybox;
@@ -75,6 +86,8 @@ private: // GUI
 
 	bool m_AddObjectWindowOpen = false;
 	bool m_AddModelWindowOpen = false;
+	NewObjectProps newObjProps;
+	NewModelProps newModelProps;
 
 	ImGuizmo::OPERATION m_CurrentGizmoOperation;
 	ImGuizmo::MODE m_CurrentGizmoMode;
