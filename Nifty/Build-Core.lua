@@ -35,7 +35,8 @@ project "Nifty"
         "ASSIMP",
         "GLM",
         "IMGUIZMO",
-        "opengl32.lib"
+        "opengl32.lib",
+        "comdlg32.lib"
     }
 
     targetdir ("../bin/" .. OutputDir .. "/%{prj.name}")

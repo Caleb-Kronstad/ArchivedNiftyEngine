@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Nifty.h"
+#include "Core/Camera.h"
 
 using namespace Nifty;
 

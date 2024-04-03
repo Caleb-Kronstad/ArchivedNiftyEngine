@@ -1,6 +1,9 @@
 #include "Nifty.h"
 
-#include "EngineLayer.h"
+class GameLayer : public EngineLayer
+{
+
+};
 
 class Sandbox : public Application
 {
@@ -9,7 +12,7 @@ private:
 public:
 	Sandbox() : Application()
 	{
-		PushLayer(new EngineLayer());
+		PushLayer(new GameLayer());
 	}
 
 	~Sandbox()

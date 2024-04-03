@@ -48,4 +48,10 @@
 // --- Windows Specific ---------
 #ifdef NF_PLATFORM_WINDOWS
 #include <Windows.h>
+#include <WinBase.h>
+#include <commdlg.h>
+#include <shellapi.h>
+#include <shtypes.h>
+#include <ShlObj_core.h>
+#include <ShlObj.h>
 #endif

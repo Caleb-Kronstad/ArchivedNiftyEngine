@@ -1,3 +1,5 @@
+#include "nfpch.h"
+
 #include "PlayerController.h"
 
 void PlayerController::ProcessKeyboard(Camera& camera, MOVEMENT_DIRECTION direction, float deltaTime)
