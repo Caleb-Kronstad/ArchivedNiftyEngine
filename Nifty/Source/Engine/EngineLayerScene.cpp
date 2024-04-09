@@ -3,7 +3,7 @@
 
 namespace Nifty
 {
-	void EngineLayer::RenderScene(Shader& shader)
+	void EngineLayer::RenderScene(Shader& shader, const bool& checkCollision)
 	{
 		std::vector<Shader*>& shadersRef = *m_Shaders;
 		std::vector<Model*>& modelsRef = *m_Models;
@@ -11,6 +11,31 @@ namespace Nifty
 
 		for (unsigned int i = 0; i < objectsRef.size(); ++i)
 		{
+			// CHECK COLLISION BETWEEN OBJECTS
+			if (checkCollision && objectsRef[i]->colliderActive)
+			{
+				if (!objectsRef[i]->colliding)
+				{
+					for (unsigned int j = 0; j < objectsRef.size(); ++j)
+					{
+						GameObject& collisionObject = *objectsRef[j];
+						if (objectsRef[j] != objectsRef[i] && objectsRef[i]->CheckCollision(collisionObject))
+						{
+							objectsRef[i]->colliding = true;
+							objectsRef[i]->currentCollidingObject = objectsRef[j];
+						}
+					}
+				}
+				else
+				{
+					GameObject& collisionObject = *objectsRef[i]->currentCollidingObject;
+					if (!objectsRef[i]->CheckCollision(collisionObject))
+					{
+						objectsRef[i]->colliding = false;
+						objectsRef[i]->currentCollidingObject = nullptr;
+					}
+				}
+			}
 			objectsRef[i]->Draw(shader, *m_Matrix);
 		}
 	}
@@ -93,9 +118,13 @@ namespace Nifty
 				std::size_t forcepos = line.find("force");
 				std::size_t forceend = line.find("force_end");
 
+				std::size_t colliderflagpos = line.find("collider_flag");
+				std::size_t colliderflagend = line.find("collider_flag_end");
+
 				unsigned int objectid = std::stoi(line.substr(idpos + 3, idend - idpos - 3));
 				unsigned int modelid = std::stoi(line.substr(modelidpos + 9, modelidend - modelidpos - 9));
 				std::string name = line.substr(namepos + 5, nameend - namepos - 6);
+				bool colliderflag = std::stoi(line.substr(colliderflagpos + 14, colliderflagend - colliderflagpos - 14));
 
 				float angle = std::stof(line.substr(anglepos + 15, angleend - anglepos - 15));
 				bool physicsflag = std::stoi(line.substr(physicsflagpos + 13, physicsflagend - physicsflagpos - 13));
@@ -148,6 +177,7 @@ namespace Nifty
 				GameObject* gameObject = new GameObject(
 					Transform(pos, scale, eulerangles, angle, physicsflag, velocity, force, mass),
 					model, name, objectid, modelid);
+				gameObject->colliderActive = colliderflag;
 				m_GameObjects->push_back(gameObject);
 			}
 		}
@@ -222,7 +252,8 @@ namespace Nifty
 								" : physics_flag " + std::to_string(objectsRef[i]->transform.PhysicsActive) + " physics_flag_end" +
 								" : mass " + std::to_string(objectsRef[i]->transform.Mass) + " mass_end" +
 								" : velocity x" + std::to_string(objectsRef[i]->transform.Velocity.x) + " y" + std::to_string(objectsRef[i]->transform.Velocity.y) + " z" + std::to_string(objectsRef[i]->transform.Velocity.z) + " velocity_end" +
-								" : force x" + std::to_string(objectsRef[i]->transform.Force.x) + " y" + std::to_string(objectsRef[i]->transform.Force.y) + " z" + std::to_string(objectsRef[i]->transform.Force.z) + " force_end";
+								" : force x" + std::to_string(objectsRef[i]->transform.Force.x) + " y" + std::to_string(objectsRef[i]->transform.Force.y) + " z" + std::to_string(objectsRef[i]->transform.Force.z) + " force_end" +
+								" : collider_flag " + std::to_string(objectsRef[i]->colliderActive) + " collider_flag_end";
 							line.replace(line.begin(), line.end(), data);
 
 							objectsRef[i]->saved = true;
@@ -251,7 +282,8 @@ namespace Nifty
 					" : physics_flag " + std::to_string(objectsRef[i]->transform.PhysicsActive) + " physics_flag_end" +
 					" : mass " + std::to_string(objectsRef[i]->transform.Mass) + " mass_end" +
 					" : velocity x" + std::to_string(objectsRef[i]->transform.Velocity.x) + " y" + std::to_string(objectsRef[i]->transform.Velocity.y) + " z" + std::to_string(objectsRef[i]->transform.Velocity.z) + " velocity_end" +
-					" : force x" + std::to_string(objectsRef[i]->transform.Force.x) + " y" + std::to_string(objectsRef[i]->transform.Force.y) + " z" + std::to_string(objectsRef[i]->transform.Force.z) + " force_end";
+					" : force x" + std::to_string(objectsRef[i]->transform.Force.x) + " y" + std::to_string(objectsRef[i]->transform.Force.y) + " z" + std::to_string(objectsRef[i]->transform.Force.z) + " force_end"+
+					" : collider_flag " + std::to_string(objectsRef[i]->colliderActive) + " collider_flag_end";
 
 				objectsRef[i]->saved = true;
 

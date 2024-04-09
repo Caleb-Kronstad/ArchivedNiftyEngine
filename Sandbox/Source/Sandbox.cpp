@@ -1,9 +1,6 @@
 #include "Nifty.h"
 
-class GameLayer : public EngineLayer
-{
-
-};
+#include "GameLayer.h"
 
 class Sandbox : public Application
 {

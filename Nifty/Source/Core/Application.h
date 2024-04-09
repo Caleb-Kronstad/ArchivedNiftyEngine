@@ -17,12 +17,15 @@
 
 namespace Nifty {
 
+	class EngineLayer;
+
 	class Application
 	{
 	private:
 		Window m_Window = Window(WindowProps());
 		Window m_Viewport = Window(WindowProps());
 		ImGuiLayer* m_ImGuiLayer;
+		EngineLayer* m_EngineLayer;
 		LayerStack m_LayerStack;
 
 		bool running = true;
@@ -37,8 +40,6 @@ namespace Nifty {
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
-
-		void OnEvent(Event& e);
 
 		void keycallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		void mousebuttoncallback(GLFWwindow* window, int button, int action, int mods);
@@ -71,6 +72,7 @@ namespace Nifty {
 		Window& GetWindow() { return m_Window; }
 		Window& GetViewport() { return m_Viewport; }
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		EngineLayer* GetEngineLayer() { return m_EngineLayer; }
 
 		void Run();
 

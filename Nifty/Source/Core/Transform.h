@@ -22,15 +22,5 @@ namespace Nifty {
 			: Position(position), Scale(scale), EulerAngles(eulerAngles), Angle(angle), PhysicsActive(physicsActive), Velocity(velocity), Force(force), Mass(mass)
 		{
 		}
-
-		void AddPhysicsComponent(glm::vec3 velocity = glm::vec3(0.0), glm::vec3 force = glm::vec3(0.0), float mass = 0.0, bool physicsActive = true)
-		{
-			this->PhysicsActive = physicsActive;
-			this->Velocity = velocity;
-			this->Force = force;
-			this->Mass = mass;
-		}
-
-		void SetPhysics(bool enabled) { PhysicsActive = enabled; }
 	};
 }

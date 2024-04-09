@@ -63,7 +63,7 @@ namespace Nifty
 
 	class EngineLayer : public Layer
 	{
-	private:
+	public:
 		Scene* m_Scene = new Scene("Assets/Scenes/testscene.nifty", "Test");
 
 		std::vector<Shader*>* m_Shaders;
@@ -82,10 +82,10 @@ namespace Nifty
 		glm::mat4* m_GizmoMatrix;
 
 		std::string m_ProjectPath;
-		std::string m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH") + "\\Documents";
+		std::string m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH");
 		std::string m_FilenameModel = std::string(MAX_PATH, '\0');
 
-	private: // GUI
+	public: // GUI
 		bool m_GameWindowInFocus;
 
 		bool m_InputTransformValues = true;
@@ -116,12 +116,13 @@ namespace Nifty
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 
+		// engine
 		void OnUpdate() override;
-		virtual void OnImGuiRender() override;
+		void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
 		void OnConstantEvent();
 
-		void RenderScene(Shader& shader);
+		void RenderScene(Shader& shader, const bool& checkCollision = false);
 		bool LoadScene(Scene* scene);
 		bool SaveScene(Scene* scene);
 

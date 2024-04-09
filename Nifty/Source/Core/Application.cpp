@@ -1,5 +1,6 @@
 #include "nfpch.h"
 #include "Application.h"
+#include "Engine/EngineLayer.h"
 
 namespace Nifty {
 
@@ -13,6 +14,7 @@ namespace Nifty {
 		m_Viewport = Window(WindowProps(1280, 720, 320, 180, "Viewport"));
 
 		m_ImGuiLayer = new ImGuiLayer();
+		m_EngineLayer = new EngineLayer();
 	}
 
 	Application::~Application()
@@ -42,6 +44,7 @@ namespace Nifty {
 
 		{
 			m_ImGuiLayer->OnAttach();
+			m_EngineLayer->OnAttach();
 			for (Layer* layer : m_LayerStack)
 				layer->OnAttach();
 		}
@@ -53,12 +56,14 @@ namespace Nifty {
 			lastFrameTime = currentFrameTime;
 
 			{
+				m_EngineLayer->OnUpdate();
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate();
 			}
 
 			{
 				m_ImGuiLayer->Begin();
+				m_EngineLayer->OnImGuiRender();
 				for (Layer* layer : m_LayerStack)
 					layer->OnImGuiRender();
 				m_ImGuiLayer->End();
@@ -71,6 +76,7 @@ namespace Nifty {
 		{
 			for (Layer* layer : m_LayerStack)
 				layer->OnDetach();
+			m_EngineLayer->OnDetach();
 			m_ImGuiLayer->OnDetach();
 		}
 		glfwTerminate();
@@ -83,6 +89,7 @@ namespace Nifty {
 			KeyPressedEvent e(keycode);
 
 			m_ImGuiLayer->OnEvent(e);
+			m_EngineLayer->OnEvent(e);
 			for (Layer* layer : m_LayerStack)
 				layer->OnEvent(e);
 		}
@@ -91,6 +98,7 @@ namespace Nifty {
 			KeyReleasedEvent e(keycode);
 
 			m_ImGuiLayer->OnEvent(e);
+			m_EngineLayer->OnEvent(e);
 			for (Layer* layer : m_LayerStack)
 				layer->OnEvent(e);
 		}
@@ -103,6 +111,7 @@ namespace Nifty {
 			MouseButtonPressedEvent e(button);
 
 			m_ImGuiLayer->OnEvent(e);
+			m_EngineLayer->OnEvent(e);
 			for (Layer* layer : m_LayerStack)
 				layer->OnEvent(e);
 		}
@@ -111,6 +120,7 @@ namespace Nifty {
 			MouseButtonReleasedEvent e(button);
 
 			m_ImGuiLayer->OnEvent(e);
+			m_EngineLayer->OnEvent(e);
 			for (Layer* layer : m_LayerStack)
 				layer->OnEvent(e);
 		}
@@ -121,6 +131,7 @@ namespace Nifty {
 		MouseMovedEvent e(xposin, yposin);
 
 		m_ImGuiLayer->OnEvent(e);
+		m_EngineLayer->OnEvent(e);
 		for (Layer* layer : m_LayerStack)
 			layer->OnEvent(e);
 	}
@@ -130,6 +141,7 @@ namespace Nifty {
 		MouseScrolledEvent e(xoffset, yoffset);
 
 		m_ImGuiLayer->OnEvent(e);
+		m_EngineLayer->OnEvent(e);
 		for (Layer* layer : m_LayerStack)
 			layer->OnEvent(e);
 	}

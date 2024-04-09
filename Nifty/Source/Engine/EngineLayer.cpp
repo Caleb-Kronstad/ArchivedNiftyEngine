@@ -3,7 +3,7 @@
 
 namespace Nifty
 {
-	EngineLayer::EngineLayer() : Layer("EngineLayer")
+	EngineLayer::EngineLayer() : Layer("Engine")
 	{
 		m_ProjectPath = std::filesystem::current_path().generic_string();
 		m_Scene = new Scene(m_ProjectPath + "/Assets/Scenes/testscene.nifty", "Test");
@@ -136,7 +136,7 @@ namespace Nifty
 		m_Shadows->Draw(); // Draw shadow map
 
 		// RENDER SCENE
-		RenderScene(*shadersRef[SHADOW_TEXTURE_LIT]);
+		RenderScene(*shadersRef[SHADOW_TEXTURE_LIT], true);
 
 		// DRAW LIGHT SOURCES
 		shadersRef[LIGHTSOURCE]->Use();

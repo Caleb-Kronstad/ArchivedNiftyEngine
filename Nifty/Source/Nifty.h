@@ -19,6 +19,7 @@
 #include "Core/GameObject.h"
 
 #include "Core/Camera.h"
+#include "Core/PlayerController.h"
 
 #include "Core/Skybox.h"
 #include "Core/Lighting.h"
@@ -31,6 +32,13 @@
 
 #include "Core/Window.h"
 #include "Core/Application.h"
+
+// PHYSICS
+#include "Physics/Collision.h"
+#include "Physics/PhysicsWorld.h"
+
+// MATH
+#include "Math/BasicMathOperations.h"
 
 // ENGINE
 #include "Engine/EngineLayer.h"

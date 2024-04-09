@@ -44,7 +44,7 @@ namespace Nifty
 		// -----MENU BAR-----------------
 		ImGui::SetNextWindowSize(ImVec2(window.GetWidth(), window.GetHeight() / 20), ImGuiCond_Always);
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-		ImGui::Begin("Menu", new bool(true), menu_flags);
+		ImGui::Begin("Menu", (bool*)false, menu_flags);
 
 		if (ImGui::BeginMenuBar())
 		{
@@ -78,7 +78,7 @@ namespace Nifty
 		// -----FILE MANAGER-------------
 		ImGui::SetNextWindowSize(ImVec2(viewport.GetWidth(), window.GetHeight() - viewport.GetHeight()), ImGuiCond_Always);
 		ImGui::SetNextWindowPos(ImVec2(window.GetWidth() - viewport.GetWidth(), viewport.GetHeight()), ImGuiCond_Always);
-		ImGui::Begin("File Manager", new bool(false), window_flags);
+		ImGui::Begin("File Manager", (bool*)false, window_flags);
 
 		for (unsigned int i = 0; i < modelsRef.size(); ++i)
 		{
@@ -102,7 +102,7 @@ namespace Nifty
 		// -----EXPLORER-----------------
 		ImGui::SetNextWindowSize(ImVec2(window.GetWidth() - viewport.GetWidth(), window.GetHeight() / 2 - (window.GetHeight() / 50)), ImGuiCond_Always);
 		ImGui::SetNextWindowPos(ImVec2(0, window.GetHeight() / 50), ImGuiCond_Always);
-		ImGui::Begin("Explorer", new bool(false), window_flags);
+		ImGui::Begin("Explorer", (bool*)false, window_flags);
 
 		for (unsigned int i = 0; i < objectsRef.size(); ++i)
 		{
@@ -121,7 +121,7 @@ namespace Nifty
 		// -----PROPERTIES---------------
 		ImGui::SetNextWindowSize(ImVec2(window.GetWidth() - viewport.GetWidth(), window.GetHeight() / 2), ImGuiCond_Always);
 		ImGui::SetNextWindowPos(ImVec2(0, window.GetHeight() / 2), ImGuiCond_Always);
-		ImGui::Begin("Properties", new bool(false), window_flags);
+		ImGui::Begin("Properties", (bool*)false, window_flags);
 
 		if (m_PropertiesObject.id != 0)
 		{
@@ -139,7 +139,7 @@ namespace Nifty
 
 					if (ImGui::Button("Change File", ImVec2(ImGui::GetWindowWidth() * 0.3f, 20)))
 					{
-						m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH") + "\\Documents";
+						m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH");
 						m_FilenameModel = std::string(MAX_PATH, '\0');
 
 						OPENFILENAMEA ofn;
@@ -157,12 +157,10 @@ namespace Nifty
 							m_FilenameModel.resize(m_FilenameModel.find('\0'));
 
 							currentModel->model_path = m_FilenameModel;
-							std::cout << "You chose the file: " << m_FilenameModel << "\n";
+							Log::Info("You chose the file: " + m_FilenameModel);
 						}
 						else
-						{
-							std::cout << "You chose to cancel the file operation.\n";
-						}
+							Log::Info("You chose to cancel the file operation");
 					}
 					ImGui::SameLine();
 					ImGui::Text(currentModel->model_path.c_str());
@@ -209,18 +207,6 @@ namespace Nifty
 
 					if (ImGui::CollapsingHeader("Transform"))
 					{
-						// IMPLEMENT IMGUIZMO SOMEDAY -- NOT DOING IT RIGHT NOW CAUSE ITS A BITCH TO ADD
-						/*if (ImGui::RadioButton("Translate", m_CurrentGizmoOperation == ImGuizmo::TRANSLATE))
-							m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
-						ImGui::SameLine();
-						if (ImGui::RadioButton("Scale", m_CurrentGizmoOperation == ImGuizmo::SCALE))
-							m_CurrentGizmoOperation = ImGuizmo::SCALE;
-						ImGui::SameLine();
-						if (ImGui::RadioButton("Rotate", m_CurrentGizmoOperation == ImGuizmo::ROTATE))
-							m_CurrentGizmoOperation = ImGuizmo::ROTATE;
-
-						ImGuizmo::DecomposeMatrixToComponents((float*)&m_GizmoMatrix, (float*)&m_PropertiesObject->transform.Position, (float*)&m_PropertiesObject->transform.EulerAngles, (float*)&m_PropertiesObject->transform.Scale);*/
-
 						ImGui::InputFloat("DragStep", &m_DragStep);
 						if (ImGui::RadioButton("Input", m_InputTransformValues))
 							m_InputTransformValues = true;
@@ -241,25 +227,6 @@ namespace Nifty
 							ImGui::DragFloat3(eulerAnglesName.c_str(), (float*)&currentObject->transform.EulerAngles, m_DragStep, 0, 1);
 							ImGui::SliderFloat(angleName.c_str(), (float*)&currentObject->transform.Angle, 0, 360);
 						}
-
-						/*ImGuizmo::RecomposeMatrixFromComponents((float*)&m_PropertiesObject->transform.Position, (float*)&m_PropertiesObject->transform.EulerAngles, (float*)&m_PropertiesObject->transform.Scale, (float*)&m_GizmoMatrix);
-
-						if (m_CurrentGizmoOperation != ImGuizmo::SCALE)
-						{
-							if (ImGui::RadioButton("Local", m_CurrentGizmoMode == ImGuizmo::LOCAL))
-								m_CurrentGizmoMode = ImGuizmo::LOCAL;
-							ImGui::SameLine();
-							if (ImGui::RadioButton("World", m_CurrentGizmoMode == ImGuizmo::WORLD))
-								m_CurrentGizmoMode = ImGuizmo::WORLD;
-						}
-
-						ImGui::Checkbox("Snap", &m_UseGizmoSnap);
-
-						ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-						glm::mat4 viewMatrix = camera->GetViewMatrix();
-						glm::mat4 projMatrix = camera->GetProjectionMatrix(viewport);
-						ImGuizmo::Manipulate((float*)&viewMatrix, (float*)&projMatrix, m_CurrentGizmoOperation, m_CurrentGizmoMode, (float*)m_Matrix, NULL);
-						*/
 					}
 
 					if (ImGui::CollapsingHeader("Model"))
@@ -392,7 +359,7 @@ namespace Nifty
 
 			if (ImGui::Button("Model File Path", ImVec2(ImGui::GetWindowWidth() * 0.3f, 20)))
 			{
-				m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH") + "\\Documents";
+				m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH");
 				m_FilenameModel = std::string(MAX_PATH, '\0');
 
 				OPENFILENAMEA ofn;
@@ -410,10 +377,10 @@ namespace Nifty
 					m_FilenameModel.resize(m_FilenameModel.find('\0'));
 
 					newModelProps.path = m_FilenameModel;
-					std::cout << "You chose the file: " << m_FilenameModel << "\n";
+					Log::Info("You chose the file: " + m_FilenameModel);
 				}
 				else
-					std::cout << "You chose to cancel the file operation.\n";
+					Log::Info("You chose to cancel the file operation");
 			}
 			ImGui::SameLine();
 			ImGui::Text(newModelProps.path.c_str());
