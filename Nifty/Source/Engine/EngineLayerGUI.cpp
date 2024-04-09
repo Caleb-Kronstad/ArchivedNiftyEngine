@@ -194,15 +194,6 @@ namespace Nifty
 				{
 					std::string name = currentObject->name + " (" + std::to_string(currentObject->id) + ")";
 
-					std::string positionName = "Position";
-					std::string scaleName = "Scale";
-					std::string eulerAnglesName = "Rotation";
-					std::string angleName = "Angle";
-
-					std::string massName = "Mass";
-					std::string velocityName = "Velocity";
-					std::string forceName = "Force";
-
 					ImGui::Text(name.c_str());
 
 					if (ImGui::CollapsingHeader("Transform"))
@@ -215,17 +206,15 @@ namespace Nifty
 
 						if (m_InputTransformValues)
 						{
-							ImGui::InputFloat3(positionName.c_str(), (float*)&currentObject->transform.Position);
-							ImGui::InputFloat3(scaleName.c_str(), (float*)&currentObject->transform.Scale);
-							ImGui::InputFloat3(eulerAnglesName.c_str(), (float*)&currentObject->transform.EulerAngles);
-							ImGui::InputFloat(angleName.c_str(), (float*)&currentObject->transform.Angle);
+							ImGui::InputFloat3("Position", (float*)&currentObject->transform.Position);
+							ImGui::InputFloat3("Scale", (float*)&currentObject->transform.Scale);
+							ImGui::InputFloat3("Rotation", (float*)&currentObject->transform.EulerAngles);
 						}
 						if (!m_InputTransformValues)
 						{
-							ImGui::DragFloat3(positionName.c_str(), (float*)&currentObject->transform.Position, m_DragStep, -1000, 1000);
-							ImGui::DragFloat3(scaleName.c_str(), (float*)&currentObject->transform.Scale, m_DragStep, 0, 1000);
-							ImGui::DragFloat3(eulerAnglesName.c_str(), (float*)&currentObject->transform.EulerAngles, m_DragStep, 0, 1);
-							ImGui::SliderFloat(angleName.c_str(), (float*)&currentObject->transform.Angle, 0, 360);
+							ImGui::DragFloat3("Position", (float*)&currentObject->transform.Position, m_DragStep, -1000, 1000);
+							ImGui::DragFloat3("Scale", (float*)&currentObject->transform.Scale, m_DragStep, 0, 1000);
+							ImGui::DragFloat3("Rotation", (float*)&currentObject->transform.EulerAngles, m_DragStep * 0.01, 0, 1);
 						}
 					}
 
@@ -245,9 +234,9 @@ namespace Nifty
 					ImGui::Checkbox("PhysicsBody Enabled", &currentObject->transform.PhysicsActive);
 					if (currentObject->transform.PhysicsActive && ImGui::CollapsingHeader("PhysicsBody"))
 					{
-						ImGui::InputFloat(massName.c_str(), &currentObject->transform.Mass);
-						ImGui::InputFloat3(velocityName.c_str(), (float*)&currentObject->transform.Velocity);
-						ImGui::InputFloat3(forceName.c_str(), (float*)&currentObject->transform.Force);
+						ImGui::InputFloat("Mass", &currentObject->transform.Mass);
+						ImGui::InputFloat3("Velocity", (float*)&currentObject->transform.Velocity);
+						ImGui::InputFloat3("Force", (float*)&currentObject->transform.Force);
 					}
 
 					if (ImGui::Button("Delete", ImVec2(ImGui::GetWindowWidth() * 0.3f, 20)))
@@ -334,7 +323,7 @@ namespace Nifty
 				if (model != nullptr && (newObjProps.modelid > 30000000 && newObjProps.modelid < 40000000) && (newObjProps.id > 20000000 && newObjProps.id < 30000000))
 				{
 					GameObject* gameObject = new GameObject(
-						Transform(newObjProps.pos, newObjProps.scale, newObjProps.eulerangles, newObjProps.angle,
+						Transform(newObjProps.pos, newObjProps.scale, newObjProps.eulerangles,
 							newObjProps.physicsflag, newObjProps.velocity, newObjProps.force, newObjProps.mass),
 						model, newObjProps.name, newObjProps.id, newObjProps.modelid);
 					gameObject->saved = false;

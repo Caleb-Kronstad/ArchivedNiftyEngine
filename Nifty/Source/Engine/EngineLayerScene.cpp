@@ -106,8 +106,6 @@ namespace Nifty
 				std::size_t scaleend = line.find("scale_end");
 				std::size_t euleranglespos = line.find("euler_angles");
 				std::size_t euleranglesend = line.find("euler_angles_end");
-				std::size_t anglepos = line.find("rotation_angle");
-				std::size_t angleend = line.find("rotation_angle_end");
 
 				std::size_t physicsflagpos = line.find("physics_flag");
 				std::size_t physicsflagend = line.find("physics_flag_end");
@@ -126,7 +124,6 @@ namespace Nifty
 				std::string name = line.substr(namepos + 5, nameend - namepos - 6);
 				bool colliderflag = std::stoi(line.substr(colliderflagpos + 14, colliderflagend - colliderflagpos - 14));
 
-				float angle = std::stof(line.substr(anglepos + 15, angleend - anglepos - 15));
 				bool physicsflag = std::stoi(line.substr(physicsflagpos + 13, physicsflagend - physicsflagpos - 13));
 				float mass = std::stof(line.substr(masspos + 5, massend - masspos - 5));
 
@@ -175,7 +172,7 @@ namespace Nifty
 				}
 
 				GameObject* gameObject = new GameObject(
-					Transform(pos, scale, eulerangles, angle, physicsflag, velocity, force, mass),
+					Transform(pos, scale, eulerangles, physicsflag, velocity, force, mass),
 					model, name, objectid, modelid);
 				gameObject->colliderActive = colliderflag;
 				m_GameObjects->push_back(gameObject);
@@ -248,7 +245,6 @@ namespace Nifty
 								" : pos x" + std::to_string(objectsRef[i]->transform.Position.x) + " y" + std::to_string(objectsRef[i]->transform.Position.y) + " z" + std::to_string(objectsRef[i]->transform.Position.z) + " pos_end" +
 								" : scale x" + std::to_string(objectsRef[i]->transform.Scale.x) + " y" + std::to_string(objectsRef[i]->transform.Scale.y) + " z" + std::to_string(objectsRef[i]->transform.Scale.z) + " scale_end" +
 								" : euler_angles x" + std::to_string(objectsRef[i]->transform.EulerAngles.x) + " y" + std::to_string(objectsRef[i]->transform.EulerAngles.y) + " z" + std::to_string(objectsRef[i]->transform.EulerAngles.z) + " euler_angles_end" +
-								" : rotation_angle " + std::to_string(objectsRef[i]->transform.Angle) + " rotation_angle_end" +
 								" : physics_flag " + std::to_string(objectsRef[i]->transform.PhysicsActive) + " physics_flag_end" +
 								" : mass " + std::to_string(objectsRef[i]->transform.Mass) + " mass_end" +
 								" : velocity x" + std::to_string(objectsRef[i]->transform.Velocity.x) + " y" + std::to_string(objectsRef[i]->transform.Velocity.y) + " z" + std::to_string(objectsRef[i]->transform.Velocity.z) + " velocity_end" +
@@ -278,7 +274,6 @@ namespace Nifty
 					" : pos x" + std::to_string(objectsRef[i]->transform.Position.x) + " y" + std::to_string(objectsRef[i]->transform.Position.y) + " z" + std::to_string(objectsRef[i]->transform.Position.z) + " pos_end" +
 					" : scale x" + std::to_string(objectsRef[i]->transform.Scale.x) + " y" + std::to_string(objectsRef[i]->transform.Scale.y) + " z" + std::to_string(objectsRef[i]->transform.Scale.z) + " scale_end" +
 					" : euler_angles x" + std::to_string(objectsRef[i]->transform.EulerAngles.x) + " y" + std::to_string(objectsRef[i]->transform.EulerAngles.y) + " z" + std::to_string(objectsRef[i]->transform.EulerAngles.z) + " euler_angles_end" +
-					" : rotation_angle " + std::to_string(objectsRef[i]->transform.Angle) + " rotation_angle_end" +
 					" : physics_flag " + std::to_string(objectsRef[i]->transform.PhysicsActive) + " physics_flag_end" +
 					" : mass " + std::to_string(objectsRef[i]->transform.Mass) + " mass_end" +
 					" : velocity x" + std::to_string(objectsRef[i]->transform.Velocity.x) + " y" + std::to_string(objectsRef[i]->transform.Velocity.y) + " z" + std::to_string(objectsRef[i]->transform.Velocity.z) + " velocity_end" +

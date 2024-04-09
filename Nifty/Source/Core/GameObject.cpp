@@ -21,9 +21,20 @@ namespace Nifty {
 	void GameObject::Draw(Shader& shader, glm::mat4& matrix)
 	{
 		matrix = glm::mat4(1.0f);
+		/* 
+		OLD WAY OF DOING TRANSLATES SCALINGS AND ROTATIONS
 		matrix = glm::translate(matrix, transform.Position);
 		matrix = glm::scale(matrix, transform.Scale);
 		matrix = glm::rotate(matrix, glm::radians(transform.Angle), transform.EulerAngles);
+		*/
+
+		transform.Rotation = glm::quat(transform.EulerAngles * glm::pi<float>() * 2.0f);
+
+		glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), transform.Position);
+		glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), transform.Scale);
+		glm::mat4 rotationMat = glm::toMat4(transform.Rotation);
+
+		matrix = translateMat * rotationMat * scaleMat;
 
 		shader.SetMat4("model", matrix);
 		if (model != nullptr)
