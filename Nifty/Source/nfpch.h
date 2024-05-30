@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 // ------------------------------
@@ -39,6 +40,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtx/quaternion.hpp>
+#include <gtx/matrix_decompose.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

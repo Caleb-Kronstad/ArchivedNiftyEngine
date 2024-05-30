@@ -1,6 +1,13 @@
 #version 460 core
 out vec4 FragColor;
 
+in VS_OUT {
+	in vec3 FragPos;
+	in vec3 Normal;
+	in vec2 TexCoords;
+	in vec4 FragPosLightSpace;
+} fs_in;
+
 struct Material {
 	sampler2D diffuse;
 	sampler2D specular;
@@ -44,16 +51,6 @@ struct SpotLight {
 	vec3 diffuse;
 	vec3 specular;
 };
-
-#define NR_POINT_LIGHTS 1
-#define NR_SPOT_LIGHTS 1
-
-in VS_OUT {
-	in vec3 FragPos;
-	in vec3 Normal;
-	in vec2 TexCoords;
-	in vec4 FragPosLightSpace;
-} fs_in;
 
 uniform vec3 viewPos;
 uniform Material material;

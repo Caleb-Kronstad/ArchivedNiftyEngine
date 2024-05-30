@@ -28,7 +28,8 @@ namespace Nifty {
 		EngineLayer* m_EngineLayer;
 		LayerStack m_LayerStack;
 
-		bool running = true;
+		bool engineRunning = true;
+		bool gameRunning = false;
 
 	public:
 		float deltaTime = 0.0f;
@@ -73,6 +74,7 @@ namespace Nifty {
 		Window& GetViewport() { return m_Viewport; }
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		EngineLayer* GetEngineLayer() { return m_EngineLayer; }
+		bool& GetGameRunState() { return gameRunning; }
 
 		void Run();
 

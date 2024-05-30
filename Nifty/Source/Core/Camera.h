@@ -2,7 +2,7 @@
 
 #include "nfpch.h"
 
-#include "Core/Entity.h"
+#include "Core/SaveSystem.h"
 #include "Core/Window.h"
 
 namespace Nifty {
@@ -14,9 +14,10 @@ namespace Nifty {
 		RIGHT
 	};
 
-	class Camera : public Entity
+	class Camera : public SaveItem
 	{
 	public:
+		bool isOrthographic = false;
 		bool mouseLocked = false;
 
 		bool firstMouse = false;
@@ -68,9 +69,9 @@ namespace Nifty {
 			return glm::lookAt(Position, Position + Front, Up);
 		}
 
-		glm::mat4 GetProjectionMatrix(Window& viewport) const
+		glm::mat4 GetProjectionMatrix(const float& width, const float& height) const
 		{
-			return glm::perspective(glm::radians(Zoom), (float)viewport.GetWidth() / (float)viewport.GetHeight(), 0.1f, 250.0f);
+			return glm::perspective(glm::radians(Zoom), width / height, 0.1f, 250.0f);
 		}
 
 		void ProcessKeyboard(MOVEMENT_DIRECTION direction, float deltaTime, glm::vec3 front, glm::vec3 right);

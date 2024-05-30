@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Math/Math.h"
 #include "Core/Application.h"
 #include "Core/Layer.h"
 #include "Core/Camera.h"
@@ -7,6 +8,13 @@
 #include "Core/Shadows.h"
 #include "Core/Shader.h"
 #include "Core/PlayerController.h"
+
+#include "Components/Components.h"
+#include "Components/Transform.h"
+#include "Components/PhysicsSystem.h"
+
+#include "Core/SaveSystem.h"
+#include "Core/Entity.h"
 
 #include "Scene/Scene.h"
 
@@ -52,12 +60,14 @@ namespace Nifty
 		unsigned int num_specular = 0;
 		unsigned int num_normal = 0;
 		unsigned int num_height = 0;
+
+		bool loadAnimations = false;
 	};
 
 	struct PropertiesObject
 	{
 		int id;
-		GameObject* objectptr = nullptr;
+		Entity* entityptr = nullptr;
 		Model* modelptr = nullptr;
 	};
 
@@ -66,29 +76,35 @@ namespace Nifty
 	public:
 		Scene* m_Scene = new Scene("Assets/Scenes/testscene.nifty", "Test");
 
+		PhysicsSystem* m_PhysicsSystem;
+
 		std::vector<Shader*>* m_Shaders;
 		std::vector<Model*>* m_Models;
-		std::vector<GameObject*>* m_GameObjects;
+		std::vector<Entity*>* m_Entities;
 		PropertiesObject m_PropertiesObject;
 
 		Skybox* m_Skybox;
 		Shadows* m_Shadows;
 		Lighting* m_Lighting;
 
-		Camera* camera;
-		PlayerController* player;
+		Camera* camera = nullptr;
+		PlayerController* player = nullptr;
 
 		glm::mat4* m_Matrix;
-		glm::mat4* m_GizmoMatrix;
 
 		std::string m_ProjectPath;
-		std::string m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH");
+		std::string m_MyDocuments = std::string(getenv("HOMEDRIVE")) + getenv("HOMEPATH") + m_ProjectPath;
 		std::string m_FilenameModel = std::string(MAX_PATH, '\0');
 
-	public: // GUI
-		bool m_GameWindowInFocus;
+		bool CTRL_DOWN = false;
+		
+		MODEL_TYPE m_LoadModelType = MODEL_TYPE::OBJ;
 
-		bool m_InputTransformValues = true;
+	public: // IMGUI
+		bool m_ViewportFocused;
+		bool m_ViewportHovered;
+		glm::vec2 m_ViewportSize;
+
 		float m_DragStep = 1.0f;
 
 		ImFont* m_MenuFont;
@@ -100,14 +116,13 @@ namespace Nifty
 		int m_FileImageWidth = 0;
 		int m_FileImageHeight = 0;
 
-		bool m_AddObjectWindowOpen = false;
+		bool m_AddEntityWindowOpen = false;
 		bool m_AddModelWindowOpen = false;
 		NewObjectProps newObjProps;
 		NewModelProps newModelProps;
 
-		ImGuizmo::OPERATION m_CurrentGizmoOperation;
-		ImGuizmo::MODE m_CurrentGizmoMode;
-		bool m_UseGizmoSnap = false;
+		int m_GizmoType = (int)ImGuizmo::TRANSLATE;
+		int m_GizmoSpace = 0;
 
 	public:
 		EngineLayer();

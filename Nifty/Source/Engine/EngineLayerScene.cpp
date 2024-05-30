@@ -5,181 +5,263 @@ namespace Nifty
 {
 	void EngineLayer::RenderScene(Shader& shader, const bool& checkCollision)
 	{
+		Application& app = Application::Get();
 		std::vector<Shader*>& shadersRef = *m_Shaders;
 		std::vector<Model*>& modelsRef = *m_Models;
-		std::vector<GameObject*>& objectsRef = *m_GameObjects;
+		std::vector<Entity*>& entitiesRef = *m_Entities;
 
-		for (unsigned int i = 0; i < objectsRef.size(); ++i)
+		for (Entity* entity : entitiesRef)
 		{
-			// CHECK COLLISION BETWEEN OBJECTS
-			if (checkCollision && objectsRef[i]->colliderActive)
+			if (app.GetGameRunState() && checkCollision)
 			{
-				if (!objectsRef[i]->colliding)
-				{
-					for (unsigned int j = 0; j < objectsRef.size(); ++j)
-					{
-						GameObject& collisionObject = *objectsRef[j];
-						if (objectsRef[j] != objectsRef[i] && objectsRef[i]->CheckCollision(collisionObject))
-						{
-							objectsRef[i]->colliding = true;
-							objectsRef[i]->currentCollidingObject = objectsRef[j];
-						}
-					}
-				}
-				else
-				{
-					GameObject& collisionObject = *objectsRef[i]->currentCollidingObject;
-					if (!objectsRef[i]->CheckCollision(collisionObject))
-					{
-						objectsRef[i]->colliding = false;
-						objectsRef[i]->currentCollidingObject = nullptr;
-					}
-				}
+				m_PhysicsSystem->StepPhysics(app.deltaTime);
 			}
-			objectsRef[i]->Draw(shader, *m_Matrix);
+			entity->Draw(shader, *m_Matrix);
 		}
 	}
 
 	bool EngineLayer::LoadScene(Scene* scene)
 	{
 		m_Models = new std::vector<Model*>;
-		m_GameObjects = new std::vector<GameObject*>;
+		m_Entities = new std::vector<Entity*>;
 
 		std::string& path = scene->GetPath();
 
 		std::ifstream file(path);
 		std::string line;
 
-		// LOAD MODELS
+		bool on_model = false;
+		bool on_entity = false;
+		bool on_component = false;
+		float x, y, z;
+		unsigned int id;
+		unsigned int c_type = NONE;
+		unsigned int enabled;
+		std::string name;
+
+		Entity* placeholder_entity = new Entity();
+		MeshData* mesh_data = nullptr;
+		PhysicsBody* physics_body = nullptr;
+		Collider* collider = nullptr;
+		Animator* animator = nullptr;
+
+		Model* placeholder_model = new Model();
+
 		while (std::getline(file, line))
 		{
-			std::size_t entitycheck = line.find("entity");
-			std::size_t typecheck = line.find("Model");
-			if (entitycheck != std::string::npos && typecheck != std::string::npos)
+			std::istringstream iss(line);
+			std::string type;
+
+			if (iss >> type)
 			{
-				std::size_t pathpos = line.find("path");
-				std::size_t pathend = line.find("path_end");
-				std::size_t idpos = line.find("id");
-				std::size_t idend = line.find("id_end");
-				std::size_t namepos = line.find("name");
-				std::size_t nameend = line.find("name_end");
-				std::size_t texturespos = line.find("textures");
-				std::size_t texturesend = line.find("textures_end");
-
-				std::string modelpath = line.substr(pathpos + 5, pathend - pathpos - 6);
-				std::string name = line.substr(namepos + 5, nameend - namepos - 6);
-				unsigned int modelid = std::stoi(line.substr(idpos + 3, idend - idpos - 3));
-				unsigned int tex1 = std::stoi(line.substr(texturespos + 9, texturesend - texturespos - 15));
-				unsigned int tex2 = std::stoi(line.substr(texturespos + 11, texturesend - texturespos - 13));
-				unsigned int tex3 = std::stoi(line.substr(texturespos + 13, texturesend - texturespos - 11));
-				unsigned int tex4 = std::stoi(line.substr(texturespos + 15, texturesend - texturespos - 9));
-
-				Model* model = new Model(modelpath, { tex1, tex2, tex3, tex4 }, modelid);
-				model->name = name;
-				m_Models->push_back(model);
-			}
-		}
-
-		file.close();
-
-		file = std::ifstream(path);
-		line = std::string();
-
-		// LOAD GAME OBJECTS
-		while (std::getline(file, line))
-		{
-			std::size_t entitycheck = line.find("entity");
-			std::size_t typecheck = line.find("GameObject");
-			if (entitycheck != std::string::npos && typecheck != std::string::npos)
-			{
-				// ITS SO MUCH I PROBABLY HAVE TO MAKE THIS BETTER LATER BUT FUCK IT
-				std::size_t idpos = line.find("id");
-				std::size_t idend = line.find("id_end");
-				std::size_t modelidpos = line.find("model_id");
-				std::size_t modelidend = line.find("model_id_end");
-				std::size_t namepos = line.find("name");
-				std::size_t nameend = line.find("name_end");
-
-				std::size_t pospos = line.find("pos");
-				std::size_t posend = line.find("pos_end");
-				std::size_t scalepos = line.find("scale");
-				std::size_t scaleend = line.find("scale_end");
-				std::size_t euleranglespos = line.find("euler_angles");
-				std::size_t euleranglesend = line.find("euler_angles_end");
-
-				std::size_t physicsflagpos = line.find("physics_flag");
-				std::size_t physicsflagend = line.find("physics_flag_end");
-				std::size_t masspos = line.find("mass");
-				std::size_t massend = line.find("mass_end");
-				std::size_t velocitypos = line.find("velocity");
-				std::size_t velocityend = line.find("velocity_end");
-				std::size_t forcepos = line.find("force");
-				std::size_t forceend = line.find("force_end");
-
-				std::size_t colliderflagpos = line.find("collider_flag");
-				std::size_t colliderflagend = line.find("collider_flag_end");
-
-				unsigned int objectid = std::stoi(line.substr(idpos + 3, idend - idpos - 3));
-				unsigned int modelid = std::stoi(line.substr(modelidpos + 9, modelidend - modelidpos - 9));
-				std::string name = line.substr(namepos + 5, nameend - namepos - 6);
-				bool colliderflag = std::stoi(line.substr(colliderflagpos + 14, colliderflagend - colliderflagpos - 14));
-
-				bool physicsflag = std::stoi(line.substr(physicsflagpos + 13, physicsflagend - physicsflagpos - 13));
-				float mass = std::stof(line.substr(masspos + 5, massend - masspos - 5));
-
-				std::string posstr = line.substr(pospos + 4, posend - pospos - 4);
-				glm::vec3 pos = glm::vec3(
-					std::stof(posstr.substr(posstr.find("x") + 1, posstr.find("y") - 1)),
-					std::stof(posstr.substr(posstr.find("y") + 1, posstr.find("z") - 1)),
-					std::stof(posstr.substr(posstr.find("z") + 1)));
-
-				std::string scalestr = line.substr(scalepos + 6, scaleend - scalepos - 6);
-				glm::vec3 scale = glm::vec3(
-					std::stof(scalestr.substr(scalestr.find("x") + 1, scalestr.find("y") - 1)),
-					std::stof(scalestr.substr(scalestr.find("y") + 1, scalestr.find("z") - 1)),
-					std::stof(scalestr.substr(scalestr.find("z") + 1)));
-
-				std::string euleranglesstr = line.substr(euleranglespos + 12, euleranglesend - euleranglespos - 12);
-				glm::vec3 eulerangles = glm::vec3(
-					std::stof(euleranglesstr.substr(euleranglesstr.find("x") + 1, euleranglesstr.find("y") - 1)),
-					std::stof(euleranglesstr.substr(euleranglesstr.find("y") + 1, euleranglesstr.find("z") - 1)),
-					std::stof(euleranglesstr.substr(euleranglesstr.find("z") + 1)));
-
-				std::string velocitystr = line.substr(velocitypos + 9, velocityend - velocitypos - 9);
-				glm::vec3 velocity = glm::vec3(
-					std::stof(velocitystr.substr(velocitystr.find("x") + 1, velocitystr.find("y") - 1)),
-					std::stof(velocitystr.substr(velocitystr.find("y") + 1, velocitystr.find("z") - 1)),
-					std::stof(velocitystr.substr(velocitystr.find("z") + 1)));
-
-				std::string forcestr = line.substr(forcepos + 9, forceend - forcepos - 9);
-				glm::vec3 force = glm::vec3(
-					std::stof(forcestr.substr(forcestr.find("x") + 1, forcestr.find("y") - 1)),
-					std::stof(forcestr.substr(forcestr.find("y") + 1, forcestr.find("z") - 1)),
-					std::stof(forcestr.substr(forcestr.find("z") + 1)));
-
-				Model* model = nullptr;
-				for (unsigned int i = 0; i < (*m_Models).size(); ++i)
+				if (type == "Model")
 				{
-					if ((*m_Models)[i]->id == modelid)
+					on_model = true;
+					if (iss >> id)
+						placeholder_model->id = id;
+				}
+				if (type == "--M--")
+				{
+					on_model = false;
+					Model* new_model = new Model(*placeholder_model);
+					new_model->LoadModel(new_model->model_path, new_model->textureTypeAmounts);
+					m_Models->push_back(new_model);
+					placeholder_model = new Model();
+				}
+
+				if (on_model)
+				{
+					if (type == "Name")
 					{
-						model = (*m_Models)[i];
+						if (iss >> name)
+							placeholder_model->name = name;
+					}
+					else if (type == "Path")
+					{
+						std::string model_path;
+						if (iss >> model_path)
+							placeholder_model->model_path = model_path;
+					}
+					else if (type == "Textures")
+					{
+						unsigned int t1, t2, t3, t4;
+						if (iss >> t1 >> t2 >> t3 >> t4)
+							placeholder_model->textureTypeAmounts = { t1, t2, t3, t4 };
 					}
 				}
-				if (model == nullptr)
+
+				if (type == "Entity")
 				{
-					Log::Error("Error finding model that corresponds to - " + name + " - object");
-					return false;
+					on_entity = true;
+					if (iss >> id)
+						placeholder_entity->id = id;
+				}
+				if (type == "--E--")
+				{
+					on_entity = false;
+					Entity* new_entity = new Entity(*placeholder_entity);
+
+					if (collider || physics_body)
+						m_PhysicsSystem->AddObject(new_entity);
+
+					if (mesh_data)
+					{
+						MeshData* new_mesh_data = new MeshData(*mesh_data);
+						new_entity->AddComponent<MeshData>(new_mesh_data);
+						mesh_data = nullptr;
+					}
+					if (physics_body)
+					{
+						PhysicsBody* new_physics_body = new PhysicsBody(*physics_body);
+						new_entity->AddComponent<PhysicsBody>(new_physics_body);
+						physics_body = nullptr;
+					}
+					if (collider)
+					{
+						Collider* new_collider = new Collider(*collider);
+						new_entity->AddComponent<Collider>(new_collider);
+						collider = nullptr;
+					}
+					if (animator)
+					{
+						// add animator
+					}
+
+					m_Entities->push_back(new_entity);
+					placeholder_entity = new Entity();
 				}
 
-				GameObject* gameObject = new GameObject(
-					Transform(pos, scale, eulerangles, physicsflag, velocity, force, mass),
-					model, name, objectid, modelid);
-				gameObject->colliderActive = colliderflag;
-				m_GameObjects->push_back(gameObject);
+				if (on_entity)
+				{
+					if (type == "Component")
+						on_component = true;
+					if (type == "--C--")
+						on_component = false;
+
+					if (!on_component)
+					{
+						if (type == "Name")
+						{
+							if (iss >> name)
+								placeholder_entity->name = name;
+						}
+						else if (type == "Position")
+						{
+							if (iss >> x >> y >> z)
+								placeholder_entity->transform.Position = glm::vec3(x, y, z);
+						}
+						else if (type == "Scale")
+						{
+							if (iss >> x >> y >> z)
+								placeholder_entity->transform.Scale = glm::vec3(x, y, z);
+						}
+						else if (type == "Rotation")
+						{
+							if (iss >> x >> y >> z)
+								placeholder_entity->transform.EulerAngles = glm::vec3(x, y, z);
+						}
+					}
+
+					if (on_component)
+					{
+						if (type == "Type")
+							iss >> c_type;
+
+						if (c_type == MESH)
+						{
+							if (!mesh_data)
+								mesh_data = new MeshData(NULL, NULL);
+
+							if (type == "Enabled")
+							{
+								if (iss >> enabled)
+									mesh_data->enabled = (bool)enabled;
+							}
+							else if (type == "ModelID")
+							{
+								unsigned int model_id = 0;
+								if (iss >> model_id)
+									mesh_data->model_id = model_id;
+
+								for (unsigned int i = 0; i < (*m_Models).size(); ++i)
+								{
+									if ((*m_Models)[i]->id == mesh_data->model_id)
+										mesh_data->model = (*m_Models)[i];
+								}
+								if (mesh_data->model == nullptr)
+									Log::Error("Error finding " + std::to_string(mesh_data->model_id) + " model id");
+							}
+						}
+						else if (c_type == PHYSICS)
+						{
+							if (!physics_body)
+								physics_body = new PhysicsBody();
+							
+							if (type == "Enabled")
+							{
+								if (iss >> enabled)
+									physics_body->enabled = (bool)enabled;
+							}
+							else if (type == "Velocity")
+							{
+								if (iss >> x >> y >> z)
+									physics_body->Velocity = glm::vec3(x, y, z);
+							}
+							else if (type == "Force")
+							{
+								if (iss >> x >> y >> z)
+									physics_body->Force = glm::vec3(x, y, z);
+							}
+							else if (type == "Mass")
+							{
+								float mass;
+								if (iss >> mass)
+									physics_body->Mass = mass;
+							}
+						}
+						else if (c_type == COLLIDER)
+						{
+							if (!collider)
+								collider = new Collider();
+
+							if (type == "Enabled")
+							{
+								if (iss >> enabled)
+									collider->enabled = (bool)enabled;
+							}
+							else if (type == "Position")
+							{
+								if (iss >> x >> y >> z)
+									collider->Position = glm::vec3(x, y, z);
+							}
+							else if (type == "Scale")
+							{
+								if (iss >> x >> y >> z)
+									collider->Scale = glm::vec3(x, y, z);
+							}
+						}
+						else if (c_type == ANIMATOR)
+						{
+
+						}
+						else if (c_type == AUDIO)
+						{
+
+						}
+					}
+				}
 			}
 		}
+		delete placeholder_entity;
+		delete placeholder_model;
+		delete mesh_data;
+		delete physics_body;
+		delete collider;
+		delete animator;
 
 		file.close();
+
+
 
 		return true;
 	}
@@ -190,120 +272,32 @@ namespace Nifty
 
 		std::vector<Shader*>& shadersRef = *m_Shaders;
 		std::vector<Model*>& modelsRef = *m_Models;
-		std::vector<GameObject*>& objectsRef = *m_GameObjects;
+		std::vector<Entity*>& entitiesRef = *m_Entities;
 
 		std::string& path = scene->GetPath();
-		std::ifstream rfile(path);
-		std::string line;
 		std::string filecontents;
 		std::string modelcontents;
-		std::string objectcontents;
+		std::string entitycontents;
 
-		filecontents += "Scene: " + scene->GetName() + "\n";
+		std::string data;
 
-		while (std::getline(rfile, line))
+		filecontents += "Scene: " + scene->GetName();
+
+		for (int i = 0; i < entitiesRef.size(); ++i)
 		{
-			std::size_t entitycheck = line.find("entity");
-			if (entitycheck != std::string::npos)
-			{
-				std::size_t modelcheck = line.find("Model");
-				if (modelcheck != std::string::npos)
-				{
-					for (unsigned int i = 0; i < modelsRef.size(); ++i)
-					{
-						std::size_t idcheck = line.find("id " + std::to_string(modelsRef[i]->id));
-						if (idcheck != std::string::npos)
-						{
-							std::string data =
-								"entity " + modelsRef[i]->type + " entity_end" +
-								" : id " + std::to_string(modelsRef[i]->id) + " id_end" +
-								" : name " + modelsRef[i]->name + " name_end" +
-								" : path " + modelsRef[i]->model_path + " path_end" +
-								" : textures " + std::to_string(modelsRef[i]->textureTypeAmounts[0]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[1]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[2]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[3]) + " textures_end";
-							line.replace(line.begin(), line.end(), data);
-
-							modelsRef[i]->saved = true;
-
-							modelcontents += line + "\n";
-						}
-					}
-				}
-
-				std::size_t objectcheck = line.find("GameObject");
-				if (objectcheck != std::string::npos)
-				{
-					for (unsigned int i = 0; i < objectsRef.size(); ++i)
-					{
-						std::size_t idcheck = line.find("id " + std::to_string(objectsRef[i]->id));
-						if (idcheck != std::string::npos)
-						{
-							std::string data =
-								"entity " + objectsRef[i]->type + " entity_end" +
-								" : id " + std::to_string(objectsRef[i]->id) + " id_end" +
-								" : model_id " + std::to_string(objectsRef[i]->modelid) + " model_id_end" +
-								" : name " + objectsRef[i]->name + " name_end" +
-								" : pos x" + std::to_string(objectsRef[i]->transform.Position.x) + " y" + std::to_string(objectsRef[i]->transform.Position.y) + " z" + std::to_string(objectsRef[i]->transform.Position.z) + " pos_end" +
-								" : scale x" + std::to_string(objectsRef[i]->transform.Scale.x) + " y" + std::to_string(objectsRef[i]->transform.Scale.y) + " z" + std::to_string(objectsRef[i]->transform.Scale.z) + " scale_end" +
-								" : euler_angles x" + std::to_string(objectsRef[i]->transform.EulerAngles.x) + " y" + std::to_string(objectsRef[i]->transform.EulerAngles.y) + " z" + std::to_string(objectsRef[i]->transform.EulerAngles.z) + " euler_angles_end" +
-								" : physics_flag " + std::to_string(objectsRef[i]->transform.PhysicsActive) + " physics_flag_end" +
-								" : mass " + std::to_string(objectsRef[i]->transform.Mass) + " mass_end" +
-								" : velocity x" + std::to_string(objectsRef[i]->transform.Velocity.x) + " y" + std::to_string(objectsRef[i]->transform.Velocity.y) + " z" + std::to_string(objectsRef[i]->transform.Velocity.z) + " velocity_end" +
-								" : force x" + std::to_string(objectsRef[i]->transform.Force.x) + " y" + std::to_string(objectsRef[i]->transform.Force.y) + " z" + std::to_string(objectsRef[i]->transform.Force.z) + " force_end" +
-								" : collider_flag " + std::to_string(objectsRef[i]->colliderActive) + " collider_flag_end";
-							line.replace(line.begin(), line.end(), data);
-
-							objectsRef[i]->saved = true;
-
-							objectcontents += line + "\n";
-						}
-					}
-				}
-			}
-		}
-		rfile.close();
-
-		for (int i = 0; i < objectsRef.size(); ++i)
-		{
-			if (objectsRef[i]->saved == false)
-			{
-				std::string data =
-					"entity " + objectsRef[i]->type + " entity_end" +
-					" : id " + std::to_string(objectsRef[i]->id) + " id_end" +
-					" : model_id " + std::to_string(objectsRef[i]->modelid) + " model_id_end" +
-					" : name " + objectsRef[i]->name + " name_end" +
-					" : pos x" + std::to_string(objectsRef[i]->transform.Position.x) + " y" + std::to_string(objectsRef[i]->transform.Position.y) + " z" + std::to_string(objectsRef[i]->transform.Position.z) + " pos_end" +
-					" : scale x" + std::to_string(objectsRef[i]->transform.Scale.x) + " y" + std::to_string(objectsRef[i]->transform.Scale.y) + " z" + std::to_string(objectsRef[i]->transform.Scale.z) + " scale_end" +
-					" : euler_angles x" + std::to_string(objectsRef[i]->transform.EulerAngles.x) + " y" + std::to_string(objectsRef[i]->transform.EulerAngles.y) + " z" + std::to_string(objectsRef[i]->transform.EulerAngles.z) + " euler_angles_end" +
-					" : physics_flag " + std::to_string(objectsRef[i]->transform.PhysicsActive) + " physics_flag_end" +
-					" : mass " + std::to_string(objectsRef[i]->transform.Mass) + " mass_end" +
-					" : velocity x" + std::to_string(objectsRef[i]->transform.Velocity.x) + " y" + std::to_string(objectsRef[i]->transform.Velocity.y) + " z" + std::to_string(objectsRef[i]->transform.Velocity.z) + " velocity_end" +
-					" : force x" + std::to_string(objectsRef[i]->transform.Force.x) + " y" + std::to_string(objectsRef[i]->transform.Force.y) + " z" + std::to_string(objectsRef[i]->transform.Force.z) + " force_end"+
-					" : collider_flag " + std::to_string(objectsRef[i]->colliderActive) + " collider_flag_end";
-
-				objectsRef[i]->saved = true;
-
-				objectcontents += data + "\n";
-			}
+			data = entitiesRef[i]->Save();
+			entitycontents += data;
 		}
 
 		for (int i = 0; i < modelsRef.size(); ++i)
 		{
-			if (modelsRef[i]->saved == false)
-			{
-				std::string data =
-					"entity " + modelsRef[i]->type + " entity_end" +
-					" : id " + std::to_string(modelsRef[i]->id) + " id_end" +
-					" : name " + modelsRef[i]->name + " name_end" +
-					" : path " + modelsRef[i]->model_path + " path_end" +
-					" : textures " + std::to_string(modelsRef[i]->textureTypeAmounts[0]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[1]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[2]) + " " + std::to_string(modelsRef[i]->textureTypeAmounts[3]) + " textures_end";
-
-				modelsRef[i]->saved = true;
-
-				modelcontents += data + "\n";
-			}
+			data = modelsRef[i]->Save();
+			modelcontents += data;
 		}
 
-		filecontents += modelcontents + objectcontents;
+		filecontents +=
+			"\n  Models: " + modelcontents + 
+			"\n  Entities: " + entitycontents;
 
 		std::ofstream wfile(path);
 

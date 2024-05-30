@@ -26,9 +26,7 @@ void GameLayer::OnUpdate()
 {
 	std::vector<Shader*>& shadersRef = *m_EngineLayer->m_Shaders;
 	std::vector<Model*>& modelsRef = *m_EngineLayer->m_Models;
-	std::vector<GameObject*>& objectsRef = *m_EngineLayer->m_GameObjects;
-
-
+	std::vector<Entity*>& entitiesRef = *m_EngineLayer->m_Entities;
 }
 
 void GameLayer::OnEvent(Event& e)

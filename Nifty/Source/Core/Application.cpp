@@ -10,8 +10,8 @@ namespace Nifty {
 	{
 		s_Instance = this;
 
-		m_Window = Window(WindowProps(1600, 900, 0, 0, "Nifty Engine"));
-		m_Viewport = Window(WindowProps(1280, 720, 320, 180, "Viewport"));
+		m_Window = Window(WindowProps(1800, 1000, 0, 0, "Nifty Engine"));
+		m_Viewport = Window(WindowProps(1550, 800, 250, 200, "Viewport"));
 
 		m_ImGuiLayer = new ImGuiLayer();
 		m_EngineLayer = new EngineLayer();
@@ -42,12 +42,10 @@ namespace Nifty {
 		glfwSetCursorPosCallback(m_Window.GetNativeWindow(), mousecallback_dispatch);
 		glfwSetScrollCallback(m_Window.GetNativeWindow(), scrollcallback_dispatch);
 
-		{
-			m_ImGuiLayer->OnAttach();
-			m_EngineLayer->OnAttach();
-			for (Layer* layer : m_LayerStack)
-				layer->OnAttach();
-		}
+		m_ImGuiLayer->OnAttach();
+		m_EngineLayer->OnAttach();
+		for (Layer* layer : m_LayerStack)
+			layer->OnAttach();
 
 		while (!glfwWindowShouldClose(m_Window.GetNativeWindow()))
 		{
@@ -55,30 +53,30 @@ namespace Nifty {
 			deltaTime = currentFrameTime - lastFrameTime;
 			lastFrameTime = currentFrameTime;
 
+			m_EngineLayer->OnUpdate();
+			if (gameRunning)
 			{
-				m_EngineLayer->OnUpdate();
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate();
 			}
 
+			m_ImGuiLayer->Begin();
+			m_EngineLayer->OnImGuiRender();
+			if (gameRunning)
 			{
-				m_ImGuiLayer->Begin();
-				m_EngineLayer->OnImGuiRender();
 				for (Layer* layer : m_LayerStack)
 					layer->OnImGuiRender();
-				m_ImGuiLayer->End();
 			}
+			m_ImGuiLayer->End();
 
 			glfwSwapBuffers(m_Window.GetNativeWindow());
 			glfwPollEvents();
 		}
 
-		{
-			for (Layer* layer : m_LayerStack)
-				layer->OnDetach();
-			m_EngineLayer->OnDetach();
-			m_ImGuiLayer->OnDetach();
-		}
+		for (Layer* layer : m_LayerStack)
+			layer->OnDetach();
+		m_EngineLayer->OnDetach();
+		m_ImGuiLayer->OnDetach();
 		glfwTerminate();
 	}
 

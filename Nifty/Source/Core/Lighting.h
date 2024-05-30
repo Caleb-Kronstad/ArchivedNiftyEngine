@@ -1,7 +1,7 @@
 #pragma once
 
 #include "nfpch.h"
-#include "Core/GameObject.h"
+#include "Core/Entity.h"
 #include "Core/Shader.h"
 
 namespace Nifty {

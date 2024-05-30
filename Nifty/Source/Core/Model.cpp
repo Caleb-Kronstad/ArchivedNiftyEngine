@@ -1,15 +1,37 @@
 #include "nfpch.h"
 #include "Model.h"
+
 #include "Core/Log.h"
+#include "Math/Math.h"
 
 namespace Nifty {
 
 	Model::Model(std::string path, std::vector<unsigned int> textureTypeAmounts, unsigned int _id)
 	{
-		model_path = path;
 		type = "Model";
+		model_path = path;
 		id = _id;
 		LoadModel(path, textureTypeAmounts);
+	}
+
+	Model::Model()
+	{
+		type = "Model";
+		model_path = "";
+		id = 0;
+	}
+
+	std::string Model::Save()
+	{
+		std::string data =
+			"\n    Model " + std::to_string(id) +
+			"\n      Name " + name +
+			"\n      Path " + model_path +
+			"\n      Textures " + std::to_string(textureTypeAmounts[0]) + " " + std::to_string(textureTypeAmounts[1]) + " " + std::to_string(textureTypeAmounts[2]) + " " + std::to_string(textureTypeAmounts[3]) + 
+			"\n    --M--";
+
+		saved = true;
+		return data;
 	}
 
 	void Model::Draw(Shader& shader)
@@ -61,7 +83,7 @@ namespace Nifty {
 			Vertex vertex;
 			glm::vec3 vector;
 
-			// process vertex positions, normals, and texture coordinates 
+			// process vertex positions, normals, and texture coordinates
 			vector.x = mesh->mVertices[i].x;
 			vector.y = mesh->mVertices[i].y;
 			vector.z = mesh->mVertices[i].z;

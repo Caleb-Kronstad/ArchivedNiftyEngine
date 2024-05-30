@@ -8,12 +8,14 @@ namespace Nifty
 		m_ProjectPath = std::filesystem::current_path().generic_string();
 		m_Scene = new Scene(m_ProjectPath + "/Assets/Scenes/testscene.nifty", "Test");
 
+		m_PhysicsSystem = new PhysicsSystem();
+
 		camera = new Camera(glm::vec3(0.0f, 2.0f, 3.0f));
 		player = new PlayerController(*camera);
 
 		m_Shaders = new std::vector<Shader*>;
 		m_Models = new std::vector<Model*>;
-		m_GameObjects = new std::vector<GameObject*>;
+		m_Entities = new std::vector<Entity*>;
 
 		m_Matrix = new glm::mat4(1.0f);
 	}
@@ -42,7 +44,8 @@ namespace Nifty
 		DirectionalLight* dirl = new DirectionalLight(glm::vec3(-2.0f, 0.0f, -2.0f), glm::vec3(0.0f));
 
 		std::vector<PointLight*>* pointl = new std::vector<PointLight*>();
-		pointl->push_back(new PointLight(glm::vec3(-3.0f, 2.5f, -1.5f), glm::vec3(0.25f), glm::vec3(1.0f)));
+		pointl->push_back(new PointLight(glm::vec3(-3.0f, 2.5f, -1.5f), glm::vec3(0.0f), glm::vec3(1.0f)));
+		pointl->push_back(new PointLight(glm::vec3(3.0f, 2.5f, 1.5f), glm::vec3(0.0f), glm::vec3(1.0f)));
 
 		std::vector<SpotLight*>* spotl = new std::vector<SpotLight*>();
 		spotl->push_back(new SpotLight(glm::vec3(500), glm::vec3(500), glm::vec3(0.25f), glm::vec3(1.0f)));
@@ -70,7 +73,7 @@ namespace Nifty
 		//m_Shaders->push_back(debugdepthShader);
 		//m_Shaders->push_back(waterShader);
 
-		LoadScene(m_Scene);
+		m_Scene->Load(m_Entities, m_Models, m_PhysicsSystem);
 
 		bool fileImage = LoadGUITextureFromFile("Assets/Textures/GUI/FileImage.png", &m_FileImageTexture, &m_FileImageWidth, &m_FileImageHeight);
 		if (m_FileImageTexture == 0)
@@ -87,7 +90,7 @@ namespace Nifty
 
 	void EngineLayer::OnDetach()
 	{
-		SaveScene(m_Scene);
+		m_Scene->Save(m_Entities, m_Models);
 	}
 
 	void EngineLayer::OnUpdate()
@@ -98,9 +101,9 @@ namespace Nifty
 
 		std::vector<Shader*>& shadersRef = *m_Shaders;
 		std::vector<Model*>& modelsRef = *m_Models;
-		std::vector<GameObject*>& objectsRef = *m_GameObjects;
+		std::vector<Entity*>& entitiesRef = *m_Entities;
 
-		if (m_GameWindowInFocus)
+		if (m_ViewportFocused)
 			OnConstantEvent();
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -118,7 +121,7 @@ namespace Nifty
 		glViewport(viewport.GetXOffset(), viewport.GetYOffset(), viewport.GetWidth(), viewport.GetHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 projection = camera->GetProjectionMatrix(viewport);
+		glm::mat4 projection = camera->GetProjectionMatrix((float)viewport.GetWidth(), (float)viewport.GetHeight());
 		glm::mat4 view = camera->GetViewMatrix();
 
 		shadersRef[SHADOW_TEXTURE_LIT]->Use();
@@ -163,19 +166,29 @@ namespace Nifty
 		{
 			KeyPressedEvent& ev = (KeyPressedEvent&)e;
 
-			// mouse lock
-			if (ev.GetKeyCode() == Key::T)
+			// run game
+			if (ev.GetKeyCode() == Key::F5)
 			{
-				if (camera->mouseLocked == false)
+				if (app.GetGameRunState() == true)
 				{
-					camera->mouseLocked = true;
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+					m_Scene->Load(m_Entities, m_Models, m_PhysicsSystem);
+					app.GetGameRunState() = false;
 				}
-				else if (camera->mouseLocked == true)
+				else if (app.GetGameRunState() == false)
 				{
-					camera->mouseLocked = false;
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					app.GetGameRunState() = true;
 				}
+			}
+
+			if (ev.GetKeyCode() == Key::LeftControl)
+			{
+				CTRL_DOWN = true;
+			}
+
+			if (ev.GetKeyCode() == Key::S)
+			{
+				if (CTRL_DOWN && app.GetGameRunState() == false)
+					m_Scene->Save(m_Entities, m_Models);
 			}
 
 			// sprinting
@@ -194,6 +207,11 @@ namespace Nifty
 		{
 			KeyReleasedEvent& ev = (KeyReleasedEvent&)e;
 
+			if (ev.GetKeyCode() == Key::LeftControl)
+			{
+				CTRL_DOWN = false;
+			}
+
 			// stop sprinting
 			if (ev.GetKeyCode() == Key::LeftShift)
 			{
@@ -208,9 +226,8 @@ namespace Nifty
 
 			if (ev.GetMouseButton() == Key::Button1)
 			{
-				if (!m_AddObjectWindowOpen && !m_AddModelWindowOpen)
+				if (!m_AddEntityWindowOpen && !m_AddModelWindowOpen)
 					camera->mouseLocked = true;
-				m_GameWindowInFocus = true;
 			}
 		}
 		else if (e.GetEventType() == EventType::MouseButtonReleased)
@@ -219,9 +236,8 @@ namespace Nifty
 
 			if (ev.GetMouseButton() == Key::Button1)
 			{
-				if (!m_AddObjectWindowOpen && !m_AddModelWindowOpen)
+				if (!m_AddEntityWindowOpen && !m_AddModelWindowOpen)
 					camera->mouseLocked = false;
-				m_GameWindowInFocus = false;
 			}
 
 		}
@@ -246,7 +262,7 @@ namespace Nifty
 			camera->lastX = xpos;
 			camera->lastY = ypos;
 
-			if (camera->mouseLocked && m_GameWindowInFocus)
+			if (camera->mouseLocked && m_ViewportFocused)
 				camera->ProcessMouseMovement(xoffset, yoffset);
 		}
 
@@ -265,38 +281,41 @@ namespace Nifty
 		GLFWwindow* window = app.GetWindow().GetNativeWindow();
 
 		// -- MOVEMENT --
-		if (glfwGetKey(window, Key::W) == GLFW_PRESS)
+		if (!CTRL_DOWN)
 		{
-			player->ProcessKeyboard(*camera, FORWARD, app.deltaTime);
+			if (glfwGetKey(window, Key::W) == GLFW_PRESS)
+			{
+				player->ProcessKeyboard(*camera, FORWARD, app.deltaTime);
 
-			if (camera->flying)
-				camera->ProcessKeyboard(FORWARD, app.deltaTime, camera->Front, camera->Right);
-			else
-				camera->ProcessKeyboard(FORWARD, app.deltaTime, player->Front, player->Right);
-		}
-		if (glfwGetKey(window, Key::S) == GLFW_PRESS) {
-			player->ProcessKeyboard(*camera, BACKWARD, app.deltaTime);
+				if (camera->flying)
+					camera->ProcessKeyboard(FORWARD, app.deltaTime, camera->Front, camera->Right);
+				else
+					camera->ProcessKeyboard(FORWARD, app.deltaTime, player->Front, player->Right);
+			}
+			if (glfwGetKey(window, Key::S) == GLFW_PRESS) {
+				player->ProcessKeyboard(*camera, BACKWARD, app.deltaTime);
 
-			if (camera->flying)
-				camera->ProcessKeyboard(BACKWARD, app.deltaTime, camera->Front, camera->Right);
-			else
-				camera->ProcessKeyboard(BACKWARD, app.deltaTime, player->Front, player->Right);
-		}
-		if (glfwGetKey(window, Key::A) == GLFW_PRESS) {
-			player->ProcessKeyboard(*camera, LEFT, app.deltaTime);
+				if (camera->flying)
+					camera->ProcessKeyboard(BACKWARD, app.deltaTime, camera->Front, camera->Right);
+				else
+					camera->ProcessKeyboard(BACKWARD, app.deltaTime, player->Front, player->Right);
+			}
+			if (glfwGetKey(window, Key::A) == GLFW_PRESS) {
+				player->ProcessKeyboard(*camera, LEFT, app.deltaTime);
 
-			if (camera->flying)
-				camera->ProcessKeyboard(LEFT, app.deltaTime, camera->Front, camera->Right);
-			else
-				camera->ProcessKeyboard(LEFT, app.deltaTime, player->Front, player->Right);
-		}
-		if (glfwGetKey(window, Key::D) == GLFW_PRESS) {
-			player->ProcessKeyboard(*camera, RIGHT, app.deltaTime);
+				if (camera->flying)
+					camera->ProcessKeyboard(LEFT, app.deltaTime, camera->Front, camera->Right);
+				else
+					camera->ProcessKeyboard(LEFT, app.deltaTime, player->Front, player->Right);
+			}
+			if (glfwGetKey(window, Key::D) == GLFW_PRESS) {
+				player->ProcessKeyboard(*camera, RIGHT, app.deltaTime);
 
-			if (camera->flying)
-				camera->ProcessKeyboard(RIGHT, app.deltaTime, camera->Front, camera->Right);
-			else
-				camera->ProcessKeyboard(RIGHT, app.deltaTime, player->Front, player->Right);
+				if (camera->flying)
+					camera->ProcessKeyboard(RIGHT, app.deltaTime, camera->Front, camera->Right);
+				else
+					camera->ProcessKeyboard(RIGHT, app.deltaTime, player->Front, player->Right);
+			}
 		}
 		// ----
 	}

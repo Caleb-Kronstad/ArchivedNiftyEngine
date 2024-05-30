@@ -23,5 +23,6 @@ namespace Nifty {
 
 		void BlockEvents(bool block) { m_BlockEvents = block; }
 		void SetCustomStyle();
+		void SetStyleClear();
 	};
 }

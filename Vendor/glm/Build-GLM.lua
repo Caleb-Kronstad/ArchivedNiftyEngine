@@ -29,11 +29,16 @@ project "GLM"
         "glm/vec2.hpp",
         "glm/vec3.hpp",
         "glm/vec4.hpp",
-        "glm/vector_relational.hpp"
+        "glm/vector_relational.hpp",
+        "glm/gtc/**cpp",
+        "glm/gtc/**hpp",
+        "glm/gtx/**cpp",
+        "glm/gtx/**hpp",
 	}
 
     defines {
-        "_CRT_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNINGS",
+        "GLM_ENABLE_EXPERIMENTAL"
     }
     
 	filter "system:windows"

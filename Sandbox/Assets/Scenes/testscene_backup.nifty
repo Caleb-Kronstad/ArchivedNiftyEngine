@@ -1,0 +1,116 @@
+SAVE 1
+Scene: Test
+type Model type_end : id 30000001 id_end : name CubeModel name_end : path Assets/Models/Cube/Cube.obj path_end : textures 1 1 1 0 textures_end
+type Model type_end : id 30000002 id_end : name PlaneModel name_end : path Assets/Models/Plane/Plane.obj path_end : textures 1 0 0 0 textures_end
+type Model type_end : id 30000003 id_end : name SphereModel name_end : path Assets/Models/Sphere/Sphere.obj path_end : textures 1 0 0 0 textures_end
+type Model type_end : id 30000004 id_end : name CharacterModel name_end : path C:\dev\NiftyEngine\Sandbox\Assets\Models\Character\Character.dae path_end : textures 0 0 0 0 textures_end
+type Entity type_end : id 20000001 id_end : model_id 30000001 model_id_end : name Cube name_end : pos x-1.598847 y-0.038492 z6.265376 pos_end : scale x1.000000 y1.000000 z1.000000 scale_end : euler_angles x0.000000 y-0.000000 z0.000000 euler_angles_end : physics_flag 1 physics_flag_end : mass 1.000000 mass_end : velocity x0.000000 y0.000000 z0.000000 velocity_end : force x0.000000 y0.000000 z0.000000 force_end : collider_flag 1 collider_flag_end : collider_pos x-1.598847 y-0.038492 z6.265376 collider_pos_end : collider_scale x1.000000 y1.000000 z1.000000 collider_scale_end : rigid_body_flag 1 rigid_body_flag_end
+type Entity type_end : id 20000002 id_end : model_id 30000002 model_id_end : name Plane name_end : pos x0.000000 y-1.000000 z0.000000 pos_end : scale x10.000000 y0.001000 z10.000000 scale_end : euler_angles x0.000000 y0.000000 z0.000000 euler_angles_end : physics_flag 0 physics_flag_end : mass 0.000000 mass_end : velocity x0.000000 y0.000000 z0.000000 velocity_end : force x0.000000 y0.000000 z0.000000 force_end : collider_flag 1 collider_flag_end : collider_pos x0.000000 y-1.000000 z0.000000 collider_pos_end : collider_scale x10.000000 y0.001000 z10.000000 collider_scale_end : rigid_body_flag 1 rigid_body_flag_end
+type Entity type_end : id 20000003 id_end : model_id 30000003 model_id_end : name Sphere name_end : pos x-0.277340 y5.943416 z-2.855634 pos_end : scale x1.000000 y1.000000 z1.000000 scale_end : euler_angles x0.000000 y-0.000000 z0.000000 euler_angles_end : physics_flag 1 physics_flag_end : mass 1.000000 mass_end : velocity x0.000000 y0.000000 z0.000000 velocity_end : force x0.000000 y0.000000 z0.000000 force_end : collider_flag 1 collider_flag_end : collider_pos x-0.277340 y-0.056971 z-7.074214 collider_pos_end : collider_scale x1.000000 y1.000000 z1.000000 collider_scale_end : rigid_body_flag 1 rigid_body_flag_end
+
+SAVE 2
+Scene: Test
+  Models: 
+    Model 30000001
+      Name CubeModel
+      Path Assets/Models/Cube/Cube.obj
+      Textures 1 1 1 0
+    --M--
+    Model 30000002
+      Name PlaneModel
+      Path Assets/Models/Plane/Plane.obj
+      Textures 1 0 0 0
+    --M--
+    Model 30000003
+      Name SphereModel
+      Path Assets/Models/Sphere/Sphere.obj
+      Textures 1 0 0 0
+    --M--
+  Entities: 
+    Entity 20000001
+      Type Entity
+      Name Cube
+      Transform 
+        Position 5.212359 4.383023 5.776878
+        Scale 1.000000 1.000000 1.000000
+        Rotation 0.000000 -0.000000 0.000000
+      Component 
+        Type 1
+        Name Mesh Data
+        Enabled 1
+	    ModelID 30000001
+      --C--
+      Component 
+        Type 2
+        Name Physics Body
+        Enabled 1
+        Velocity 0.000000 0.000000 0.000000
+        Force 0.000000 0.000000 0.000000
+        Mass 1.000000
+      --C--
+      Component 
+        Type 3
+        Name Collider
+        Enabled 1
+        Position -1.598847 -0.038492 6.265376
+        Scale 1.000000 1.000000 1.000000
+      --C--
+    --E--
+    Entity 20000002
+      Type Entity
+      Name Plane
+      Transform 
+        Position 0.000000 -1.000000 0.000000
+        Scale 10.000000 0.001000 10.000000
+        Rotation 0.000000 0.000000 0.000000
+      Component 
+        Type 1
+        Name Mesh Data
+        Enabled 1
+	    ModelID 30000002
+      --C--
+      Component 
+        Type 2
+        Name Physics Body
+        Enabled 1
+        Velocity 0.000000 0.000000 0.000000
+        Force 0.000000 0.000000 0.000000
+        Mass 0.000000
+      --C--
+      Component 
+        Type 3
+        Name Collider
+        Enabled 1
+        Position 0.000000 -1.000000 0.000000
+        Scale 10.000000 0.001000 10.000000
+      --C--
+    --E--
+    Entity 20000003
+      Type Entity
+      Name Sphere
+      Transform 
+        Position -0.277340 5.943416 -2.855634
+        Scale 1.000000 1.000000 1.000000
+        Rotation 0.000000 -0.000000 0.000000
+      Component 
+        Type 1
+        Name Mesh Data
+        Enabled 1
+	    ModelID 30000003
+      --C--
+      Component 
+        Type 2
+        Name Physics Body
+        Enabled 1
+        Velocity 0.000000 0.000000 0.000000
+        Force 0.000000 0.000000 0.000000
+        Mass 1.000000
+      --C--
+      Component 
+        Type 3
+        Name Collider
+        Enabled 1
+        Position -0.277340 -0.056971 -7.074214
+        Scale 1.000000 1.000000 1.000000
+      --C--
+    --E--
