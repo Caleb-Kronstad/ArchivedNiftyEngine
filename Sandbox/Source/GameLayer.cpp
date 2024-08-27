@@ -24,9 +24,8 @@ void GameLayer::OnDetach()
 
 void GameLayer::OnUpdate()
 {
-	std::vector<Shader*>& shadersRef = *m_EngineLayer->m_Shaders;
-	std::vector<Model*>& modelsRef = *m_EngineLayer->m_Models;
-	std::vector<Entity*>& entitiesRef = *m_EngineLayer->m_Entities;
+	std::vector<Model*>*& models = m_EngineLayer->GetModels();
+	std::vector<Entity*>*& entities = m_EngineLayer->GetEntities();
 }
 
 void GameLayer::OnEvent(Event& e)

@@ -11,6 +11,8 @@ namespace Nifty {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_SAMPLES, 4);
 
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+
 		m_Window = glfwCreateWindow(GetWidth(), GetHeight(), GetTitle().c_str(), NULL, NULL);
 
 		if (m_Window == NULL) {

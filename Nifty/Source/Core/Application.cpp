@@ -1,6 +1,6 @@
 #include "nfpch.h"
 #include "Application.h"
-#include "Engine/EngineLayer.h"
+#include "MainEngine/MainEngine.h"
 
 namespace Nifty {
 
@@ -10,8 +10,10 @@ namespace Nifty {
 	{
 		s_Instance = this;
 
-		m_Window = Window(WindowProps(1800, 1000, 0, 0, "Nifty Engine"));
-		m_Viewport = Window(WindowProps(1550, 800, 250, 200, "Viewport"));
+		m_Window = Window(WindowProps(1280, 720, 0, 0, "Nifty Engine"));
+		unsigned int viewportw = m_Window.GetWidth() * viewportWidthPercentage;
+		unsigned int viewporth = m_Window.GetHeight() * viewportHeightPercentage;
+		m_Viewport = Window(WindowProps(viewportw, viewporth, m_Window.GetWidth() - viewportw, m_Window.GetHeight() - viewporth, "Viewport"));
 
 		m_ImGuiLayer = new ImGuiLayer();
 		m_EngineLayer = new EngineLayer();
@@ -41,6 +43,7 @@ namespace Nifty {
 		glfwSetMouseButtonCallback(m_Window.GetNativeWindow(), mousebuttoncallback_dispatch);
 		glfwSetCursorPosCallback(m_Window.GetNativeWindow(), mousecallback_dispatch);
 		glfwSetScrollCallback(m_Window.GetNativeWindow(), scrollcallback_dispatch);
+		glfwSetFramebufferSizeCallback(m_Window.GetNativeWindow(), framebuffersizecallback_dispatch);
 
 		m_ImGuiLayer->OnAttach();
 		m_EngineLayer->OnAttach();
@@ -142,5 +145,14 @@ namespace Nifty {
 		m_EngineLayer->OnEvent(e);
 		for (Layer* layer : m_LayerStack)
 			layer->OnEvent(e);
+	}
+
+	void Application::framebuffersizecallback(GLFWwindow* window, int width, int height)
+	{
+		m_Window.ChangeProps(WindowProps(width, height, 0, 0, "Nifty Engine"));
+		unsigned int viewportw = m_Window.GetWidth() * viewportWidthPercentage;
+		unsigned int viewporth = m_Window.GetHeight() * viewportHeightPercentage;
+		m_Viewport.ChangeProps(WindowProps(viewportw, viewporth, m_Window.GetWidth() - viewportw, m_Window.GetHeight() - viewporth, "Viewport"));
+		glViewport(m_Viewport.GetXOffset(), m_Viewport.GetYOffset(), m_Viewport.GetWidth(), m_Viewport.GetHeight());
 	}
 }

@@ -10,6 +10,7 @@ project "Nifty"
 
     files { 
         "Source/**.h", 
+        "Source/**.hpp", 
         "Source/**.cpp",
         
         "%{IncludeDir.STB_IMAGE}/**.h",

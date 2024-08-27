@@ -11,7 +11,7 @@ namespace Nifty {
 		unsigned int yOffset;
 		std::string Title;
 
-		WindowProps(const unsigned int& width = 1600, const unsigned int& height = 900, const unsigned int& xoffset = 0, unsigned int yoffset = 0, const std::string& title = "Nifty Engine")
+		WindowProps(const unsigned int& width = 1280, const unsigned int& height = 720, const unsigned int& xoffset = 0, unsigned int yoffset = 0, const std::string& title = "Nifty Engine")
 			: Width(width), Height(height), xOffset(xoffset), yOffset(yoffset), Title(title)
 		{
 		}

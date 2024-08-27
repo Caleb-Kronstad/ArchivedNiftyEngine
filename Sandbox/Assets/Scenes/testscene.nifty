@@ -1,4 +1,54 @@
 Scene: Test
+  Shaders: 
+    Shader 40000000
+      Type Shader
+      Name TextureLit
+      VertexPath Assets/Shaders/texture-lit.vert
+      FragmentPath Assets/Shaders/texture-lit.frag
+    --S--
+    Shader 40000001
+      Type Shader
+      Name ShadowTextureLit
+      VertexPath Assets/Shaders/shadow-texture-lit.vert
+      FragmentPath Assets/Shaders/shadow-texture-lit.frag
+    --S--
+    Shader 40000002
+      Type Shader
+      Name TextureUnlit
+      VertexPath Assets/Shaders/texture-unlit.vert
+      FragmentPath Assets/Shaders/texture-unlit.frag
+    --S--
+    Shader 40000003
+      Type Shader
+      Name LightSource
+      VertexPath Assets/Shaders/lightsource.vert
+      FragmentPath Assets/Shaders/lightsource.frag
+    --S--
+    Shader 40000004
+      Type Shader
+      Name Skybox
+      VertexPath Assets/Shaders/skybox.vert
+      FragmentPath Assets/Shaders/skybox.frag
+    --S--
+    Shader 40000005
+      Type Shader
+      Name ShadowMap
+      VertexPath Assets/Shaders/shadowmap.vert
+      FragmentPath Assets/Shaders/shadowmap.frag
+    --S--
+    Shader 40000006
+      Type Shader
+      Name PointShadowMap
+      VertexPath Assets/Shaders/pointshadowmap.vert
+      FragmentPath Assets/Shaders/pointshadowmap.frag
+      GeometryPath Assets/Shaders/pointshadowmap.geom
+    --S--
+    Shader 40000007
+      Type Shader
+      Name AnimShader
+      VertexPath Assets/Shaders/animshader.vert
+      FragmentPath Assets/Shaders/animshader.frag
+    --S--
   Models: 
     Model 30000001
       Name CubeModel
@@ -17,22 +67,24 @@ Scene: Test
     --M--
     Model 30000004
       Name CharacterModel
-      Path C:\dev\NiftyEngine\Sandbox\Assets\Models\Character\Character.dae
-      Textures 0 0 0 0
+      Path Assets/Models/ThinMatrix/model.dae
+      Textures 1 0 0 0
     --M--
   Entities: 
     Entity 20000001
       Type Entity
       Name Cube
       Transform 
-        Position -3.123077 10.835011 5.776878
+        Position -3.367141 5.298769 -3.154526
         Scale 1.000000 1.000000 1.000000
         Rotation 0.000000 -0.000000 0.000000
+        HasShadows 1
+        ShaderID 40000001
       Component 
         Type 1
         Name Mesh Data
         Enabled 1
-	    ModelID 30000001
+        ModelID 30000001
       --C--
       Component 
         Type 2
@@ -54,14 +106,16 @@ Scene: Test
       Type Entity
       Name Plane
       Transform 
-        Position 0.000000 -1.000000 0.000000
+        Position 0.000000 0.000000 0.000000
         Scale 10.000000 0.001000 10.000000
-        Rotation 0.000000 0.000000 0.000000
+        Rotation 0.000000 -0.000000 0.000000
+        HasShadows 0
+        ShaderID 40000001
       Component 
         Type 1
         Name Mesh Data
         Enabled 1
-	    ModelID 30000002
+        ModelID 30000002
       --C--
       Component 
         Type 3
@@ -75,14 +129,16 @@ Scene: Test
       Type Entity
       Name Sphere
       Transform 
-        Position 2.344967 6.405615 0.588908
+        Position 2.155865 4.452496 3.874509
         Scale 1.000000 1.000000 1.000000
         Rotation 0.000000 -0.000000 0.000000
+        HasShadows 1
+        ShaderID 40000001
       Component 
         Type 1
         Name Mesh Data
         Enabled 1
-	    ModelID 30000003
+        ModelID 30000003
       --C--
       Component 
         Type 2
@@ -102,17 +158,13 @@ Scene: Test
     --E--
     Entity 20000004
       Type Entity
-      Name Character
+      Name PointLight
       Transform 
-        Position 5.417918 2.653057 -7.313556
-        Scale 1.000000 1.000000 1.000001
-        Rotation 177.676651 64.509315 178.885162
-      Component 
-        Type 1
-        Name Mesh Data
-        Enabled 1
-	    ModelID 30000004
-      --C--
+        Position -3.881826 4.438767 -3.033772
+        Scale 1.000000 1.000000 1.000000
+        Rotation 1.000000 1.000000 1.000000
+        HasShadows 0
+        ShaderID 40000001
       Component 
         Type 3
         Name Collider
@@ -120,4 +172,45 @@ Scene: Test
         Position 0.000000 0.000000 0.000000
         Scale 1.000000 1.000000 1.000000
       --C--
+      Component 
+        Type 7
+        Name Point Light
+        Enabled 1
+        Range 1.000000 1.000000 1.000000
+        Color 255.000000 255.000000 255.000000
+      --C--
+    --E--
+    Entity 20000005
+      Type Entity
+      Name Sun
+      Transform 
+        Position -8.542984 15.261905 0.413446
+        Scale 1.000000 1.000000 1.000000
+        Rotation 1.000000 1.000000 1.000000
+        HasShadows 0
+        ShaderID 40000001
+      Component 
+        Type 6
+        Name Directional Light
+        Enabled 1
+        Direction -17.000000 37.000000 -12.000000
+        Color 100.000000 100.000000 100.000000
+      --C--
+      Component 
+        Type 7
+        Name Point Light
+        Enabled 1
+        Range 1.000000 1.000000 1.000000
+        Color 255.000000 255.000000 255.000000
+      --C--
+    --E--
+    Entity 20000006
+      Type Entity
+      Name Character
+      Transform 
+        Position 0.000000 2.561728 0.000000
+        Scale 1.000000 0.999999 0.999999
+        Rotation 0.000000 -0.000000 0.000000
+        HasShadows 0
+        ShaderID 40000007
     --E--

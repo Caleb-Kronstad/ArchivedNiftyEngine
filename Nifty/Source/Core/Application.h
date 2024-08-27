@@ -13,7 +13,7 @@
 #include "Input/KeyCodes.h"
 #include "Input/KeyEvent.h"
 
-#include "ImGui/ImGuiLayer.h"
+#include "UserInterface/ImGui/ImGuiLayer.h"
 
 namespace Nifty {
 
@@ -34,6 +34,8 @@ namespace Nifty {
 	public:
 		float deltaTime = 0.0f;
 		float lastFrameTime = 0.0f;
+		float viewportWidthPercentage = 0.875;
+		float viewportHeightPercentage = 0.8;
 
 	public:
 		Application();
@@ -46,6 +48,7 @@ namespace Nifty {
 		void mousebuttoncallback(GLFWwindow* window, int button, int action, int mods);
 		void mousecallback(GLFWwindow* window, double xposin, double yposin);
 		void scrollcallback(GLFWwindow* window, double xoffset, double yoffset);
+		void framebuffersizecallback(GLFWwindow* window, int width, int height);
 
 		static void keycallback_dispatch(GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
@@ -66,6 +69,11 @@ namespace Nifty {
 		{
 			if (s_Instance)
 				s_Instance->scrollcallback(window, xoffset, yoffset);
+		}
+		static void framebuffersizecallback_dispatch(GLFWwindow* window, int width, int height)
+		{
+			if (s_Instance)
+				s_Instance->framebuffersizecallback(window, width, height);
 		}
 
 		static Application& Get() { return *s_Instance; }

@@ -20,6 +20,8 @@
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
+
+#include <cmath>
 // ------------------------------
 
 
@@ -28,7 +30,7 @@
 #include <imgui_internal.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-#include <ImGui/imgui_stdlib.h>
+#include <UserInterface/ImGui/imgui_stdlib.h>
 
 #include <ImGuizmo.h>
 

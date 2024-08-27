@@ -7,6 +7,7 @@ project "Sandbox"
 
     files { 
         "Source/**.h", 
+        "Source/**.hpp", 
         "Source/**.cpp",
         
         "Assets/**.vert",

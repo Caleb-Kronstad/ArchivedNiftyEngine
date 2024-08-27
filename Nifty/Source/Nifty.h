@@ -16,9 +16,13 @@ limitations under the License.
 
 #pragma once
 
-#include "Core/Core.h"
 #include "Core/Log.h"
-#include "Math/Math.h"
+#include "Core/FileUtility.h"
+#include "Core/MathUtility.h"
+#include "Core/TextUtility.h"
+#include "Core/Layer.h"
+#include "Core/LayerStack.h"
+#include "Core/Window.h"
 
 #include "Input/MouseCodes.h"
 #include "Input/KeyCodes.h"
@@ -26,36 +30,25 @@ limitations under the License.
 #include "Input/KeyEvent.h"
 #include "Input/MouseEvent.h"
 
-#include "Core/Layer.h"
-#include "Core/LayerStack.h"
+#include "UserInterface/ImGui/ImGuiLayer.h"
 
-#include "Components/Components.h"
-#include "Components/Transform.h"
-#include "Components/PhysicsSystem.h"
+#include "PhysicsEngine/PhysicsSystem.h"
+#include "PhysicsEngine/Animation/Bone.h"
+#include "PhysicsEngine/Animation/Animation.h"
+#include "PhysicsEngine/Animation/Animator.h"
 
-#include "Core/Shader.h"
-#include "Core/Mesh.h"
-#include "Core/Model.h"
+#include "RenderingEngine/Shaders/Shader.h"
+#include "RenderingEngine/Shaders/ShaderClasses.h"
+#include "RenderingEngine/Camera.h"
+#include "RenderingEngine/Lighting.h"
+#include "RenderingEngine/Shadows.h"
+#include "RenderingEngine/Transform.h"
+#include "RenderingEngine/Mesh.h"
+#include "RenderingEngine/Model.h"
+#include "RenderingEngine/Components.h"
+#include "RenderingEngine/Entity.h"
+#include "RenderingEngine/Skybox.h"
+#include "RenderingEngine/Scene.h"
 
-#include "Core/Camera.h"
-#include "Core/PlayerController.h"
-
-#include "Core/Skybox.h"
-#include "Core/Lighting.h"
-#include "Core/Shadows.h"
-
-#include "Scene/SceneCamera.h"
-#include "Scene/Scene.h"
-
-#include "ImGui/ImGuiLayer.h"
-
-#include "Core/Window.h"
 #include "Core/Application.h"
-
-#include "Core/Entity.h"
-#include "Core/SaveSystem.h"
-
-// ENGINE
-#include "Engine/EngineLayer.h"
-
-#include "Core/SaveSystem.h"
+#include "MainEngine/MainEngine.h"
