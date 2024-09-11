@@ -119,8 +119,8 @@ namespace Nifty
 			else if (m_Components[i]->type == SKINNED_MESH)
 			{
 				SkinnedMesh* skinnedMesh = GetComponent<SkinnedMesh>();
-				data +=
-					"\n        ModelID " + std::to_string(skinnedMesh->model_id);
+				/*data +=
+					"\n        ModelID " + std::to_string(skinnedMesh->model_id);*/
 			}
 			else
 				Log::Error("Component type error during save");

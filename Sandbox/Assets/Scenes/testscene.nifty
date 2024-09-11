@@ -75,7 +75,7 @@ Scene: Test
       Type Entity
       Name Cube
       Transform 
-        Position -3.367141 5.298769 -3.154526
+        Position 1.596078 3.101895 -4.248889
         Scale 1.000000 1.000000 1.000000
         Rotation 0.000000 -0.000000 0.000000
         HasShadows 1
@@ -98,7 +98,7 @@ Scene: Test
         Type 3
         Name Collider
         Enabled 1
-        Position 2.645577 -0.032463 5.776878
+        Position 1.258966 0.900877 -4.211183
         Scale 1.000000 1.000000 1.000000
       --C--
     --E--
@@ -121,7 +121,7 @@ Scene: Test
         Type 3
         Name Collider
         Enabled 1
-        Position 0.000000 -1.000000 0.000000
+        Position 0.000000 0.000000 0.000000
         Scale 10.000000 0.001000 10.000000
       --C--
     --E--
@@ -129,7 +129,7 @@ Scene: Test
       Type Entity
       Name Sphere
       Transform 
-        Position 2.155865 4.452496 3.874509
+        Position -1.391838 0.971233 2.352578
         Scale 1.000000 1.000000 1.000000
         Rotation 0.000000 -0.000000 0.000000
         HasShadows 1
@@ -152,7 +152,7 @@ Scene: Test
         Type 3
         Name Collider
         Enabled 1
-        Position 2.344967 -0.122199 0.588908
+        Position -1.391838 0.971233 2.352578
         Scale 1.000000 1.000000 1.000000
       --C--
     --E--
@@ -160,7 +160,7 @@ Scene: Test
       Type Entity
       Name PointLight
       Transform 
-        Position -3.881826 4.438767 -3.033772
+        Position -7.339719 7.745336 -2.915661
         Scale 1.000000 1.000000 1.000000
         Rotation 1.000000 1.000000 1.000000
         HasShadows 0
@@ -169,7 +169,7 @@ Scene: Test
         Type 3
         Name Collider
         Enabled 1
-        Position 0.000000 0.000000 0.000000
+        Position -7.339719 7.745336 -2.915661
         Scale 1.000000 1.000000 1.000000
       --C--
       Component 
@@ -213,4 +213,11 @@ Scene: Test
         Rotation 0.000000 -0.000000 0.000000
         HasShadows 0
         ShaderID 40000007
+      Component 
+        Type 7
+        Name Point Light
+        Enabled 1
+        Range 1.000000 1.000000 1.000000
+        Color 255.000000 255.000000 255.000000
+      --C--
     --E--

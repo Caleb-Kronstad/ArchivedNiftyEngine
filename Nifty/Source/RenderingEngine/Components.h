@@ -58,21 +58,53 @@ namespace Nifty
 	};
 
 	struct SkinnedMesh : public Component // skinned mesh component (more updated than other components)
-	{
-		
+	{/*
 	private:
+		Bone* m_RootBone;
+		unsigned int m_BoneCount;
+		Animator* m_Animator;
 
 	public:
 		Model* model;
 		unsigned int model_id;
 
-		SkinnedMesh(Model* _model, unsigned int _id = 0)
-			: model(_model), model_id(_id)
+		SkinnedMesh(Model* _model, Bone* rootBone, unsigned int boneCount = 0, unsigned int id = 0)
+			: model(_model), m_RootBone(rootBone), m_BoneCount(boneCount), model_id(id)
 		{
 			type = SKINNED_MESH;
 			name = "Skinned Mesh";
+
+			m_Animator = new Animator();
+			rootBone->CalcInverseBindTransform(glm::mat4(1.0f));
 		}
-		
+
+		Bone* GetRootBone() const { return m_RootBone; }
+
+		void PerformAnimation(Animation* animation)
+		{
+			m_Animator->PerformAnimation(animation);
+		}
+
+		void Update(float deltaTime)
+		{
+			m_Animator->Update(deltaTime, this);
+		}
+
+		std::vector<glm::mat4> GetBoneTransforms()
+		{
+			std::vector<glm::mat4> boneMatrices;
+			AddBonesToArray(m_RootBone, boneMatrices);
+			return boneMatrices;
+		}
+
+		void AddBonesToArray(Bone* rootBone, std::vector<glm::mat4>& boneMatrices)
+		{
+			boneMatrices[rootBone->GetIndex()] = rootBone->GetAnimatedTransform();
+			for (Bone* child : rootBone->GetChildren())
+			{
+				AddBonesToArray(child, boneMatrices);
+			}
+		}*/
 	};
 
 	struct AnimatorData : public Component // animator for animations

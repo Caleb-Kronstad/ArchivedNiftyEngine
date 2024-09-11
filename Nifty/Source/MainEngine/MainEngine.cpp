@@ -133,6 +133,10 @@ namespace Nifty
 					SkinnedMesh* skinned_mesh = entity->GetComponent<SkinnedMesh>();
 					if (skinned_mesh)
 					{
+						/*skinned_mesh->Update(app.deltaTime);
+						std::vector<glm::mat4> boneTransforms = skinned_mesh->GetBoneTransforms();
+						for (unsigned int i = 0; i < boneTransforms.size(); ++i)
+							shader->SetMat4("boneTransforms[" + std::to_string(i) + "]", boneTransforms[i]);*/
 					}
 				}
 				

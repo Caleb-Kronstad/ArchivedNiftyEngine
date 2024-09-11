@@ -292,7 +292,7 @@ namespace Nifty
 						}
 						else if (c_type == SKINNED_MESH)
 						{
-							if (!skinned_mesh)
+							/*if (!skinned_mesh)
 								skinned_mesh = new SkinnedMesh(NULL, NULL);
 
 							if (type == "Enabled")
@@ -313,7 +313,7 @@ namespace Nifty
 								}
 								if (skinned_mesh->model == nullptr)
 									Log::Error("Error finding " + std::to_string(skinned_mesh->model_id) + " model id");
-							}
+							}*/
 						}
 						else if (c_type == PHYSICS)
 						{
