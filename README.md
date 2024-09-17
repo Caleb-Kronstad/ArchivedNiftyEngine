@@ -1,3 +1,3 @@
 # Nifty Engine
 
-[calebkronsta](https://calebkronstad.com/niftyengine/nifty-engine)
+[calebkronstad.com](https://calebkronstad.com/niftyengine/nifty-engine)
